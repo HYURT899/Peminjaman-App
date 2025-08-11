@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AssetController;
+use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +17,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/daftar', [AssetController::class, 'index'])->name('assets.index');
+    Route::post('/peminjam', [PeminjamController::class, 'store'])->name('peminjam.store');
+
 });
 
 require __DIR__.'/auth.php';
