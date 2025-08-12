@@ -13,7 +13,9 @@ class AssetController extends Controller
     public function index()
     {
         $assets = Asset::paginate(10);
-        return view('public.index', compact('assets'));
+        $barang = Asset::all();
+
+        return view('public.index', compact('assets', 'barang'));
     }
 
     /**

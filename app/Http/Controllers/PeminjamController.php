@@ -13,7 +13,7 @@ class PeminjamController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**

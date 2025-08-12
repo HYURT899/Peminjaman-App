@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-light shadow">
     <div class="container">
         {{-- Logo --}}
-        <a class="navbar-brand" href="{{ route('dashboard') }}">
+        <a class="navbar-brand text-dark" href="{{ route('dashboard') }}">
             {{-- Ganti dengan logo atau nama aplikasi --}}
             {{ config('app.name', 'Laravel') }}
         </a>
@@ -16,9 +16,14 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             {{-- Left Side (Menu) --}}
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
-                </li>
+                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}">
+                    Dashboard
+                </x-nav-link>
+
+                <x-nav-link :active="request()->routeIs('assets.index')" href="{{ route('assets.index') }}">
+                    Daftar Asset
+                </x-nav-link>
+
                 {{-- Tambahkan link lainnya di sini --}}
             </ul>
 
