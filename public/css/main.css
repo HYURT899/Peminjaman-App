@@ -157,7 +157,7 @@ h6 {
 }
 
 .header .logo img {
-  max-height: 36px;
+  max-height: 36px; /* jaga ukuran logo tetap kecil */
   height: auto;
   margin-right: 8px;
 }
@@ -198,12 +198,8 @@ h6 {
   }
 
   .header .navmenu {
-  margin-left: auto;      /* dorong ke kanan */
-}
-
-.header .navmenu ul {
-  justify-content: flex-end; /* pastikan item di kanan */
-}
+    order: 3;
+  }
 }
 
 /*--------------------------------------------------------------
