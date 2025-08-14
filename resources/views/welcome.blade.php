@@ -62,10 +62,10 @@
       <div class="container text-center" data-aos="zoom-out" data-aos-delay="100">
         <div class="row justify-content-center">
           <div class="col-lg-8">
-            <h2>Peminjaman Barang</h2>
-            <p>Peminjaman barang adalah proses meminjamkan suatu barang dari</p>
-            <p>pemilik kepada pihak lain untuk digunakan dalam jangka waktu tertentu,</p> 
-                <p>dengan syarat barang tersebut dikembalikan dalam kondisi baik sesuai kesepakatan.</p>
+            <h2 class="text-white">Peminjaman Barang</h2>
+            <p class="text-white">Peminjaman barang adalah proses meminjamkan suatu barang dari</p>
+            <p class="text-white">pemilik kepada pihak lain untuk digunakan dalam jangka waktu tertentu,</p> 
+                <p class="text-white">dengan syarat barang tersebut dikembalikan dalam kondisi baik sesuai kesepakatan.</p>
             <a href="about.html" class="btn-get-started">About Me</a>
           </div>
         </div>
