@@ -1,12 +1,17 @@
 <?php
 
-use App\Http\Controllers\AssetController;
-use App\Http\Controllers\PeminjamController;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AssetController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PeminjamController;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 });
 
 Route::get('/dashboard', function () {
@@ -19,7 +24,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/daftar', [AssetController::class, 'index'])->name('assets.index');
     Route::post('/peminjam', [PeminjamController::class, 'store'])->name('peminjam.store');
-
 });
 
 require __DIR__.'/auth.php';
