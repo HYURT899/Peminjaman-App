@@ -5,24 +5,39 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PeminjamController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\AssetAdminController;
+use App\Http\Controllers\Admin\PeminjamAdminController;
 
+// Halaman Awal tanpa login
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Route untuk ADMIN
+// Halaman Admin
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/assets', [AssetAdminController::class, 'index'])->name('admin.assets');
+    Route::get('/admin/peminjam', [PeminjamController::class, 'index'])->name('admin.peminjam.index');
 });
 
+// Route untuk USER / Peminjam biasa
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Halaman daftar asset
     Route::get('/daftar', [AssetController::class, 'index'])->name('assets.index');
+
+    // Peminjam melakukan peminjaman
     Route::post('/peminjam', [PeminjamController::class, 'store'])->name('peminjam.store');
 });
 

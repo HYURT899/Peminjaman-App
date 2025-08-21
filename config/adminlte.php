@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Title
@@ -299,10 +298,10 @@ return [
     */
 
     'menu' => [
-        // Navbar items:
+        // Navbar
         [
             'type' => 'navbar-search',
-            'text' => 'search',
+            'text' => 'Search',
             'topnav_right' => true,
         ],
         [
@@ -310,87 +309,65 @@ return [
             'topnav_right' => true,
         ],
 
-        // Sidebar items:
+        // Sidebar
+        ['header' => 'DASHBOARD'],
         [
-            'type' => 'sidebar-menu-search',
-            'text' => 'search',
+            'text' => 'Dashboard',
+            'url' => 'admin',
+            'icon' => 'fas fa-fw fa-home',
+        ],
+
+        ['header' => 'MANAJEMEN'],
+        [
+            'text' => 'Kelola Asset',
+            'url' => 'admin/assets',
+            'icon' => 'fas fa-fw fa-boxes',
         ],
         [
-            'text' => 'blog',
-            'url' => 'admin/blog',
-            'can' => 'manage-blog',
+            'text' => 'Kelola Peminjam',
+            'url' => 'admin/peminjam',
+            'icon' => 'fas fa-fw fa-users',
         ],
         [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
+            'text' => 'Kelola User',
+            'url' => 'admin/users',
+            'icon' => 'fas fa-fw fa-users',
         ],
-        ['header' => 'account_settings'],
+
+        ['header' => 'TRANSAKSI'],
         [
-            'text' => 'profile',
-            'url' => 'admin/settings',
+            'text' => 'Peminjaman Asset',
+            'url' => 'admin/pinjam',
+            'icon' => 'fas fa-fw fa-handshake',
+        ],
+        [
+            'text' => 'Pengembalian Asset',
+            'url' => 'admin/pengembalian',
+            'icon' => 'fas fa-fw fa-undo',
+        ],
+        [
+            'text' => 'Laporan Kerusakan',
+            'url' => 'admin/kerusakan',
+            'icon' => 'fas fa-fw fa-tools',
+        ],
+
+        ['header' => 'LAPORAN'],
+        [
+            'text' => 'Print Laporan',
+            'url' => 'admin/laporan',
+            'icon' => 'fas fa-fw fa-print',
+        ],
+
+        ['header' => 'PENGATURAN AKUN'],
+        [
+            'text' => 'Profile',
+            'url' => 'admin/settings/profile',
             'icon' => 'fas fa-fw fa-user',
         ],
         [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
+            'text' => 'Ganti Password',
+            'url' => 'admin/settings/password',
             'icon' => 'fas fa-fw fa-lock',
-        ],
-        [
-            'text' => 'multilevel',
-            'icon' => 'fas fa-fw fa-share',
-            'submenu' => [
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                    'submenu' => [
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                        ],
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                            'submenu' => [
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-            ],
-        ],
-        ['header' => 'labels'],
-        [
-            'text' => 'important',
-            'icon_color' => 'red',
-            'url' => '#',
-        ],
-        [
-            'text' => 'warning',
-            'icon_color' => 'yellow',
-            'url' => '#',
-        ],
-        [
-            'text' => 'information',
-            'icon_color' => 'cyan',
-            'url' => '#',
         ],
     ],
 
@@ -406,15 +383,7 @@ return [
     |
     */
 
-    'filters' => [
-        JeroenNoten\LaravelAdminLte\Menu\Filters\GateFilter::class,
-        JeroenNoten\LaravelAdminLte\Menu\Filters\HrefFilter::class,
-        JeroenNoten\LaravelAdminLte\Menu\Filters\SearchFilter::class,
-        JeroenNoten\LaravelAdminLte\Menu\Filters\ActiveFilter::class,
-        JeroenNoten\LaravelAdminLte\Menu\Filters\ClassesFilter::class,
-        JeroenNoten\LaravelAdminLte\Menu\Filters\LangFilter::class,
-        JeroenNoten\LaravelAdminLte\Menu\Filters\DataFilter::class,
-    ],
+    'filters' => [JeroenNoten\LaravelAdminLte\Menu\Filters\GateFilter::class, JeroenNoten\LaravelAdminLte\Menu\Filters\HrefFilter::class, JeroenNoten\LaravelAdminLte\Menu\Filters\SearchFilter::class, JeroenNoten\LaravelAdminLte\Menu\Filters\ActiveFilter::class, JeroenNoten\LaravelAdminLte\Menu\Filters\ClassesFilter::class, JeroenNoten\LaravelAdminLte\Menu\Filters\LangFilter::class, JeroenNoten\LaravelAdminLte\Menu\Filters\DataFilter::class],
 
     /*
     |--------------------------------------------------------------------------

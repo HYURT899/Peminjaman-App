@@ -20,8 +20,7 @@
                             @if ($asset->gambar && file_exists(public_path($asset->gambar)))
                                 <img src="{{ asset($asset->gambar) }}" class="card-img-top" alt="{{ $asset->nama_asset }}">
                             @else
-                                <div class="d-flex align-items-center justify-content-center bg-light"
-                                    style="height:200px;">
+                                <div class="d-flex align-items-center justify-content-center bg-light" style="height:200px;">
                                     <span class="text-muted">No image</span>
                                 </div>
                             @endif
