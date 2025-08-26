@@ -15,11 +15,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route untuk ADMIN
-// Halaman Admin
+// Route buat ADMIN
 Route::middleware(['auth', 'admin'])->group(function () {
+    // Dashboard
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/assets', [AssetAdminController::class, 'index'])->name('admin.assets');
+
+    // Assets
+    Route::resource('/admin/assets', AssetAdminController::class)->names('admin.assets');
+
+    // Peminjam
     Route::get('/admin/peminjam', [PeminjamController::class, 'index'])->name('admin.peminjam.index');
 });
 

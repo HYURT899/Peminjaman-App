@@ -11,8 +11,15 @@ class Asset extends Model
     use HasFactory;
 
     public function peminjams()
-{
-    return $this->hasMany(Peminjam::class);
-}
+    {
+        return $this->hasMany(Peminjam::class);
+    }
 
+    protected $fillable = [
+        'kode_asset',
+        'nama_asset',
+        'gambar',
+        'deskripsi',
+        'stok',
+    ];
 }
