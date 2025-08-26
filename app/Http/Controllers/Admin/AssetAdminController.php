@@ -13,7 +13,7 @@ class AssetAdminController extends Controller
      */
     public function index()
     {
-        $asset = Asset::paginate(10);
+        $asset = Asset::all();
 
         return view('admin.assets', compact('asset'));
     }
