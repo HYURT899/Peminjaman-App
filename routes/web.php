@@ -6,10 +6,13 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AssetAdminController;
 use App\Http\Controllers\Admin\PeminjamAdminController;
+<<<<<<< HEAD
 use App\Http\Controllers\Admin\CategoryController;
+=======
+use App\Http\Controllers\UserController;
+>>>>>>> 1c89f6bbca6b33f4bd5af80dd032258d67fa68eb
 
 // Halaman Awal tanpa login
 Route::get('/', function () {
@@ -29,6 +32,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Peminjam
     Route::get('/admin/peminjam', [PeminjamController::class, 'index'])->name('admin.peminjam.index');
+
+    // Users
+    Route::resource('/admin/users', UserController::class)->names('admin.users');
 });
 
 // Route untuk USER / Peminjam biasa
