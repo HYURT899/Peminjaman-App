@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('gambar')->nullable(); // Path/URL gambar
             $table->text('deskripsi')->nullable(); // Keterangan
             $table->integer('stok')->default(1); // Jumlah tersedia
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

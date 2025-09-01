@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\Storage;
 use App\Models\Asset;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class AssetAdminController extends Controller
 {
@@ -14,9 +15,18 @@ class AssetAdminController extends Controller
      */
     public function index()
     {
-        $asset = Asset::all();
+        $assets = Asset::with('kategori')->get();
+        $categories = Category::all();
+        return view('admin.assets', compact('assets', 'categories'));
+    }
 
-        return view('admin.assets', compact('asset'));
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $categories = Category::all();
+        return view('admin.create', compact('categories'));
     }
 
     /**
@@ -27,6 +37,7 @@ class AssetAdminController extends Controller
         $request->validate([
             'kode_asset' => 'required|unique:assets',
             'nama_asset' => 'required',
+            'category_id' => 'required|exists:categories,id', // VALIDASI CATEGORY
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'deskripsi' => 'nullable|string',
             'stok' => 'required|integer|min:1',
@@ -45,12 +56,13 @@ class AssetAdminController extends Controller
         Asset::create([
             'kode_asset' => $request->kode_asset,
             'nama_asset' => $request->nama_asset,
-            'gambar' => $path, // simpan path relatif
+            'category_id' => $request->category_id, // TAMBAHKAN INI
+            'gambar' => $path,
             'deskripsi' => $request->deskripsi,
             'stok' => $request->stok,
         ]);
 
-        return redirect()->back()->with('success', 'Asset berhasil ditambahkan!');
+        return redirect('/admin/assets')->with('success', 'Asset berhasil ditambahkan!');
     }
 
     /**
@@ -64,47 +76,49 @@ class AssetAdminController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Asset $asset)
     {
-        // 
+        $categories = Category::all();
+        return view('admin.editAsset', compact('asset', 'categories'));
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-{
-    $asset = Asset::findOrFail($id);
+    {
+        $asset = Asset::findOrFail($id);
 
-    $request->validate([
-        'kode_asset' => 'required|unique:assets,kode_asset,' . $asset->id,
-        'nama_asset' => 'required',
-        'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        'deskripsi' => 'nullable|string',
-        'stok' => 'required|integer|min:1',
-    ]);
+        $request->validate([
+            'kode_asset' => 'required|unique:assets,kode_asset,' . $asset->id,
+            'nama_asset' => 'required',
+            'category_id' => 'required|exists:categories,id', // VALIDASI CATEGORY
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'deskripsi' => 'nullable|string',
+            'stok' => 'required|integer|min:1',
+        ]);
 
-    $path = $asset->gambar; // default tetap gambar lama
+        $path = $asset->gambar; // default tetap gambar lama
 
-    if ($request->hasFile('gambar')) {
-        // ambil nama asli file
-        $filename = $request->file('gambar')->getClientOriginalName();
+        if ($request->hasFile('gambar')) {
+            // ambil nama asli file
+            $filename = $request->file('gambar')->getClientOriginalName();
 
-        // simpan di storage/app/public/images dengan nama asli
-        $path = $request->file('gambar')->storeAs('images', $filename, 'public');
+            // simpan di storage/app/public/images dengan nama asli
+            $path = $request->file('gambar')->storeAs('images', $filename, 'public');
+        }
+
+        $asset->update([
+            'kode_asset' => $request->kode_asset,
+            'nama_asset' => $request->nama_asset,
+            'category_id' => $request->category_id, // TAMBAHKAN INI
+            'gambar' => $path,
+            'deskripsi' => $request->deskripsi,
+            'stok' => $request->stok,
+        ]);
+
+        return redirect()->back()->with('success', 'Asset berhasil diperbarui!');
     }
-
-    $asset->update([
-        'kode_asset' => $request->kode_asset,
-        'nama_asset' => $request->nama_asset,
-        'gambar' => $path,
-        'deskripsi' => $request->deskripsi,
-        'stok' => $request->stok,
-    ]);
-
-    return redirect()->back()->with('success', 'Asset berhasil diperbarui!');
-}
-
 
     /**
      * Remove the specified resource from storage.

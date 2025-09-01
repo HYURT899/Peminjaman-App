@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AssetAdminController;
 use App\Http\Controllers\Admin\PeminjamAdminController;
+use App\Http\Controllers\Admin\CategoryController;
 
 // Halaman Awal tanpa login
 Route::get('/', function () {
@@ -22,6 +23,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Assets
     Route::resource('/admin/assets', AssetAdminController::class)->names('admin.assets');
+
+    // Kategori
+    Route::resource('/admin/category', CategoryController::class)->names('categories');
 
     // Peminjam
     Route::get('/admin/peminjam', [PeminjamController::class, 'index'])->name('admin.peminjam.index');

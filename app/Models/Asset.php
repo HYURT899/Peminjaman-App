@@ -14,6 +14,10 @@ class Asset extends Model
     {
         return $this->hasMany(Peminjam::class);
     }
+    public function kategori()
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
 
     protected $fillable = [
         'kode_asset',
@@ -21,5 +25,6 @@ class Asset extends Model
         'gambar',
         'deskripsi',
         'stok',
+        'category_id'
     ];
 }

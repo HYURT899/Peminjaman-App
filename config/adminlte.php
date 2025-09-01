@@ -324,6 +324,11 @@ return [
             'icon' => 'fas fa-fw fa-boxes',
         ],
         [
+            'text' => 'Kelola Kategori',
+            'url' => 'admin/category',
+            'icon' => 'fas fa-th',
+        ],
+        [
             'text' => 'Kelola Peminjam',
             'url' => 'admin/peminjam',
             'icon' => 'fas fa-fw fa-users',

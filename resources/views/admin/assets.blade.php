@@ -7,12 +7,20 @@
 @stop
 
 @section('content')
-    <div class="d-flex">
-        <button class="btn btn-primary btn-round ml-auto mb-3" data-toggle="modal" data-target="#addRowModal">
-            <i class="fa fa-plus"></i>
-            Tambah Asset
-        </button>
-        @include('layouts.modalCreateAssetAdmin')
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center">
+            <label class="mr-2">Filter Kategori:</label>
+            <select id="categoryFilter" class="form-control" style="width: 200px;">
+                <option value="">Semua Kategori</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->name }}">{{ $category->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <a href="{{ route('admin.assets.create') }}" class="btn btn-primary btn-around">
+            <i class="fa fa-plus pr-2"></i>
+            Tambah data
+        </a>
     </div>
 
     <div class="container-fluid my-4">
@@ -24,14 +32,15 @@
                         <th>Gambar</th>
                         <th>Code Asset</th>
                         <th>Nama Asset</th>
+                        <th>Kategori</th>
                         <th>Deskripsi</th>
                         <th>Stok</th>
-                        <th>Aksi</th> {{-- Tambah kolom aksi --}}
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @php $no = 1; @endphp
-                    @foreach ($asset as $item)
+                    @foreach ($assets as $item)
                         <tr class="table-light">
                             <td>{{ $no++ }}</td>
                             <td>
@@ -43,18 +52,15 @@
                             </td>
                             <td>{{ $item->kode_asset }}</td>
                             <td>{{ $item->nama_asset }}</td>
+                            <td>{{ $item->kategori->name ?? 'Tidak ada kategori' }}</td>
                             <td>{{ $item->deskripsi }}</td>
                             <td>{{ $item->stok }}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    {{-- Tombol Edit --}}
-                                    <button class="btn btn-sm btn-warning" data-toggle="modal"
-                                        data-target="#editRowModal-{{ $item->id }}">
+                                    <a href="{{ route('admin.assets.edit', $item->id) }}" class="btn btn-warning btn-sm">
                                         <i class="fa fa-edit"></i> Edit
-                                    </button>
-                                    @include('layouts.modalEditAssetAdmin')
+                                    </a>
 
-                                    {{-- Tombol Hapus --}}
                                     <form action="{{ route('admin.assets.destroy', $item->id) }}" method="POST"
                                         onsubmit="return confirm('Yakin hapus asset ini?')" style="display:inline-block;">
                                         @csrf
@@ -85,11 +91,19 @@
 
     <script>
         $(document).ready(function() {
-            $('#assetTable').DataTable({
+            var table = $('#assetTable').DataTable({
                 "pageLength": 5,
                 "lengthChange": true,
                 "searching": true,
                 "ordering": true
+            });
+
+            // Category filter functionality
+            $('#categoryFilter').on('change', function() {
+                var category = $(this).val();
+                table.column(4) // index of category column (0-based)
+                    .search(category)
+                    .draw();
             });
         });
     </script>
