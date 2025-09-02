@@ -44,7 +44,7 @@ class CategoryController extends Controller
         $category->slug = Str::slug($request->input('name'));
         $category->save();
 
-        return redirect('/admin/category');
+        return redirect('/admin/category')->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     /**
@@ -82,7 +82,7 @@ class CategoryController extends Controller
         $category->slug = Str::slug($request->input('name'));
         $category->save();
 
-        return redirect('/admin/category');
+        return redirect('/admin/category')->with('success', 'Kategori berhasil diperbarui!');
     }
 
     /**
@@ -92,6 +92,6 @@ class CategoryController extends Controller
     {
         Category::where('id', $id)->delete();
 
-        return redirect('/admin/categories');
+        return redirect('/admin/categories')->with('success', 'Kategori berhasil dihapus!');
     }
 }

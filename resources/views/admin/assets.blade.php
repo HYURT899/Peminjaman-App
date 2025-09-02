@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Manajemen Assets')
+@section('title', 'Daftar Asset')
 
 @section('content_header')
     <h1 class="text-xl text-bold">Daftar Assets</h1>
@@ -12,7 +12,7 @@
             <label class="mr-2">Filter Kategori:</label>
             <select id="categoryFilter" class="form-control" style="width: 200px;">
                 <option value="">Semua Kategori</option>
-                @foreach($categories as $category)
+                @foreach ($categories as $category)
                     <option value="{{ $category->name }}">{{ $category->name }}</option>
                 @endforeach
             </select>
@@ -32,9 +32,9 @@
                         <th>Gambar</th>
                         <th>Code Asset</th>
                         <th>Nama Asset</th>
-                        <th>Kategori</th>
                         <th>Deskripsi</th>
                         <th>Stok</th>
+                        <th>Kategori</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -52,9 +52,9 @@
                             </td>
                             <td>{{ $item->kode_asset }}</td>
                             <td>{{ $item->nama_asset }}</td>
-                            <td>{{ $item->kategori->name ?? 'Tidak ada kategori' }}</td>
                             <td>{{ $item->deskripsi }}</td>
                             <td>{{ $item->stok }}</td>
+                            <td>{{ $item->kategori->name ?? 'Tidak ada kategori' }}</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <a href="{{ route('admin.assets.edit', $item->id) }}" class="btn btn-warning btn-sm">
@@ -82,13 +82,14 @@
 
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @stop
 
 @section('js')
+    {{-- Scirpt buat data table --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-
     <script>
         $(document).ready(function() {
             var table = $('#assetTable').DataTable({
@@ -106,5 +107,15 @@
                     .draw();
             });
         });
+    </script>
+
+    {{-- Script buat flash message --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        @foreach (['success', 'error', 'warning', 'info'] as $type)
+            @if (Session::has($type))
+                toastr.{{ $type }}("{{ Session::get($type) }}");
+            @endif
+        @endforeach
     </script>
 @stop

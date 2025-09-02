@@ -5,18 +5,14 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PeminjamController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AssetAdminController;
 use App\Http\Controllers\Admin\PeminjamAdminController;
-<<<<<<< HEAD
 use App\Http\Controllers\Admin\CategoryController;
-=======
 use App\Http\Controllers\UserController;
->>>>>>> 1c89f6bbca6b33f4bd5af80dd032258d67fa68eb
 
 // Halaman Awal tanpa login
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 });
 
 // Route buat ADMIN

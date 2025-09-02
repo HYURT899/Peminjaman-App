@@ -1,8 +1,13 @@
 @extends('adminlte::page')
 
+@section('title', 'Buat Kategori')
+
+@section('content_header')
+    <h1 class="text-xl text-bold">Buat Kategori Baru</h1>
+@stop
+
 @section('content')
 <div class="container">
-    <h2>Buat Kategori Baru</h2>
     <form action="{{ route('categories.store') }}" method="POST">
         @csrf
         <div class="mb-3">

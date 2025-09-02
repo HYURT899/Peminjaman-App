@@ -117,7 +117,7 @@ class AssetAdminController extends Controller
             'stok' => $request->stok,
         ]);
 
-        return redirect()->back()->with('success', 'Asset berhasil diperbarui!');
+        return redirect()->route('admin.assets.index')->with('success', 'Asset berhasil diperbarui!');
     }
 
     /**
