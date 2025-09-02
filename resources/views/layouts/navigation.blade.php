@@ -47,7 +47,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a>
+                                <a class="dropdown-item" href="">Profile</a>
                             </li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">

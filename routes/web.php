@@ -30,7 +30,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/peminjam', [PeminjamController::class, 'index'])->name('admin.peminjam.index');
 
     // Users
-    Route::resource('/admin/users', UserController::class)->names('admin.users');
+    Route::resource('/admin/user/users', UserController::class)->names('admin.users');
 });
 
 // Route untuk USER / Peminjam biasa

@@ -11,9 +11,9 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->role === 'admin') {
+        if (Auth::check() && Auth::user()->role === 1) {
             return $next($request);
         }
-        return redirect('/');
+        return redirect('/login')->with('error', 'Anda tidak memiliki akses ke halaman admin.');
     }
 }

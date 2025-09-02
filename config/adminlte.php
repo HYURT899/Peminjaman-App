@@ -335,7 +335,7 @@ return [
         ],
         [
             'text' => 'Kelola User',
-            'url' => 'admin/users',
+            'url' => 'admin/user/users',
             'icon' => 'fas fa-fw fa-users',
         ],
 
@@ -361,18 +361,6 @@ return [
             'text' => 'Print Laporan',
             'url' => 'admin/laporan',
             'icon' => 'fas fa-fw fa-print',
-        ],
-
-        ['header' => 'PENGATURAN AKUN'],
-        [
-            'text' => 'Profile',
-            'url' => 'admin/settings/profile',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'Ganti Password',
-            'url' => 'admin/settings/password',
-            'icon' => 'fas fa-fw fa-lock',
         ],
     ],
 
