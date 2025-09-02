@@ -17,7 +17,7 @@ class UserController extends Controller
     public function create()
     {
         $roleNames = DB::table('roles')->pluck('role_name', 'id');
-        return view('admin.users.create_user', compact('roleNames'));
+        return view('admin.user.create_user', compact('roleNames'));
     }
 
     public function store(Request $request)

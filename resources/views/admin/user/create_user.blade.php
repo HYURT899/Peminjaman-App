@@ -3,40 +3,62 @@
 @section('title', 'Tambah User')
 
 @section('content')
-<div class="container">
-    <h2>Tambah User</h2>
-    <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="mb-3">
-            <label>Nama</label>
-            <input type="text" name="name" class="form-control" required>
+@section('content_header')
+    <h1 class="text-xl text-bold">Tambah Asset Baru</h1>
+@stop
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card shadow rounded-3">
+                <div class="card-body">
+                    <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Nama</label>
+                                <input type="text" id="name" name="name" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" id="password" name="password" class="form-control" required minlength="6">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="jabatan" class="form-label">Jabatan</label>
+                                <input type="text" id="jabatan" name="jabatan" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="role" class="form-label">Role</label>
+                                <select id="role" name="role" class="form-control" required>
+                                    <option value="" disabled selected>-- Pilih Role --</option>
+                                    @foreach($roleNames as $id => $name)
+                                        <option value="{{ $id }}">{{ ucfirst($name) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="gambar" class="form-label">Gambar</label>
+                                <input type="file" id="gambar" name="gambar" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary me-2">Kembali</a>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" name="email" class="form-control" required>
-        </div>
-        <div class="mb-3">
-    <label>Password</label>
-    <input type="password" name="password" class="form-control" required>
-</div>
-        <div class="mb-3">
-            <label>Jabatan</label>
-            <input type="text" name="jabatan" class="form-control" required>
-        </div>
-        <div class="mb-3">
-    <label>Role</label>
-    <select name="role" class="form-control" required>
-        @foreach($roleNames as $id => $name)
-            <option value="{{ $id }}">{{ $name }}</option>
-        @endforeach
-    </select>
-</div>
-        <div class="mb-3">
-            <label>Gambar</label>
-            <input type="file" name="gambar" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-primary">Simpan</button>
-        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Kembali</a>
-    </form>
+    </div>
 </div>
 @stop
