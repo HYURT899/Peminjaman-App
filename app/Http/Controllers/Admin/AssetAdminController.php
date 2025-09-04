@@ -17,7 +17,7 @@ class AssetAdminController extends Controller
     {
         $assets = Asset::with('kategori')->get();
         $categories = Category::all();
-        return view('admin.assets', compact('assets', 'categories'));
+        return view('admin.assets.assets', compact('assets', 'categories'));
     }
 
     /**
@@ -26,7 +26,7 @@ class AssetAdminController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.create', compact('categories'));
+        return view('admin.assets.create', compact('categories'));
     }
 
     /**
@@ -79,7 +79,7 @@ class AssetAdminController extends Controller
     public function edit(Asset $asset)
     {
         $categories = Category::all();
-        return view('admin.editAsset', compact('asset', 'categories'));
+        return view('admin.assets.editAsset', compact('asset', 'categories'));
     }
 
     /**

@@ -4,12 +4,12 @@
 
 @section('content')
 @section('content_header')
-    <h1 class="text-xl text-bold">Tambah Asset Baru</h1>
+    <h1 class="text-xl text-bold">Tambah User Baru</h1>
 @stop
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-12">
-            <div class="card shadow rounded-3">
+            <div class="card rounded-3">
                 <div class="card-body">
                     <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -51,9 +51,13 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-end">
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary me-2">Kembali</a>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan
+                            </button>
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
                         </div>
                     </form>
                 </div>

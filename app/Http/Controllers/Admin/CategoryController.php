@@ -16,7 +16,7 @@ class CategoryController extends Controller
     {
         $categories = Category::all();
 
-        return view('categories.index', compact('categories'));
+        return view('admin.categories.index', compact('categories'));
     }
 
     /**
@@ -24,7 +24,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('categories.create');
+        return view('admin.categories.create');
     }
 
     /**
@@ -62,7 +62,7 @@ class CategoryController extends Controller
     {
         $category = Category::find($id);
 
-        return view('categories.edit', compact('categories'));
+        return view('admin.categories.edit', compact('categories'));
     }
 
     /**
@@ -92,6 +92,6 @@ class CategoryController extends Controller
     {
         Category::where('id', $id)->delete();
 
-        return redirect('/admin/categories')->with('success', 'Kategori berhasil dihapus!');
+        return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus!');
     }
 }

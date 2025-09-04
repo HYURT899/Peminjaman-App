@@ -9,9 +9,7 @@
 @section('content')
 <div class="container">
     <a href="{{ route('categories.create') }}" class="btn btn-primary mb-3">Tambah Kategori</a>
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    
     <table class="table table-bordered">
         <thead>
             <tr>

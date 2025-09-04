@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Asset;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 
 class AssetSeeder extends Seeder
@@ -13,6 +13,12 @@ class AssetSeeder extends Seeder
      */
     public function run(): void
     {
-        Asset::factory()->count(10)->create();
+        // Create categories first
+        $categories = Category::factory(3)->create();
+
+        // Create 5 assets for each category
+        $categories->each(function ($category) {
+            Asset::factory(5)->withCategory($category)->create();
+        });
     }
 }

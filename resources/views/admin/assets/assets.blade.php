@@ -7,6 +7,7 @@
 @stop
 
 @section('content')
+    {{-- Filter Ketgori --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex align-items-center">
             <label class="mr-2">Filter Kategori:</label>
@@ -102,7 +103,7 @@
             // Category filter functionality
             $('#categoryFilter').on('change', function() {
                 var category = $(this).val();
-                table.column(4) // index of category column (0-based)
+                table.column(6) // index of category column (0-based)
                     .search(category)
                     .draw();
             });

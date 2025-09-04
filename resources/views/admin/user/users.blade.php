@@ -9,9 +9,9 @@
 @section('content')
     <div class="d-flex">
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-round ml-auto mb-3">
-    <i class="fa fa-plus"></i>
-    Tambah User
-</a>
+            <i class="fa fa-plus"></i>
+            Tambah User
+        </a>
     </div>
 
     <div class="container-fluid my-4">
@@ -43,10 +43,14 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->jabatan }}</td>
-                            <td>{{ $roles[$user->role] ?? '-' }}</td>
+                            <td>@if ($user->role == 1)
+                                    <p>Admin</p>
+                                @endif
+                            </td>
                             <td>
-                               <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display:inline;">
+                                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
+                                    style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus user?')">Delete</button>
@@ -78,5 +82,15 @@
                 "ordering": true
             });
         });
+    </script>
+
+    {{-- Script buat flash message --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        @foreach (['success', 'error', 'warning', 'info'] as $type)
+            @if (Session::has($type))
+                toastr.{{ $type }}("{{ Session::get($type) }}");
+            @endif
+        @endforeach
     </script>
 @stop
