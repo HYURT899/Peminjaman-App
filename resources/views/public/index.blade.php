@@ -32,14 +32,12 @@
                                 @endif
 
                                 <div class="mt-auto">
-                                    <p class="mb-2">Stok: <strong>{{ $asset->stok }}</strong></p>
                                     <form action="{{ route('peminjam.store') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="asset_id" value="{{ $asset->id }}">
                                         <button type="button" class="btn btn-primary btn-sm w-100" data-bs-toggle="modal"
                                             data-bs-target="#modalPeminjaman" data-barang-id="{{ $asset->id }}"
-                                            data-barang-nama="{{ $asset->nama_asset }}"
-                                            @if ($asset->stok <= 0) disabled @endif>
+                                            data-barang-nama="{{ $asset->nama_asset }}">
                                             Pinjam
                                         </button>
                                         @include('layouts.modalMinjam')

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AssetController;
+use App\Http\Controllers\AssetController; // <-- PASTIKAN Controller ini di-import
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\Admin\AssetAdminController;
@@ -12,8 +12,12 @@ use App\Http\Controllers\UserController;
 
 // Halaman Awal tanpa login
 Route::get('/', function () {
-    return view('dashboard');
+    return view('public.dashboard');
 });
+
+// ROUTE UNTUK SCAN QR CODE (TAMBAHKAN INI)
+// Route ini publik, bisa diakses tanpa login
+
 
 // Route buat ADMIN
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -22,6 +26,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Assets
     Route::resource('/admin/assets', AssetAdminController::class)->names('admin.assets');
+    Route::get('admin/asset/{kode_asset}', [AssetAdminController::class, 'showByQr'])->name('asset.qr.show');
 
     // Kategori
     Route::resource('/admin/category', CategoryController::class)->names('categories');
@@ -31,6 +36,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Users
     Route::resource('/admin/user/users', UserController::class)->names('admin.users');
+
 });
 
 // Route untuk USER / Peminjam biasa

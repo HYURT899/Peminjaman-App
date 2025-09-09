@@ -80,18 +80,6 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="stok">Stok</label>
-                            <input type="number" name="stok" id="stok"
-                                class="form-control @error('stok') is-invalid @enderror"
-                                value="{{ old('stok', $asset->stok) }}" required min="1">
-                            @error('stok')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
                             <label for="category_id">Kategori</label>
                             <select name="category_id" id="category_id"
                                 class="form-control @error('category_id') is-invalid @enderror" required>

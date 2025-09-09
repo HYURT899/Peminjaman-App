@@ -22,7 +22,6 @@ class AssetFactory extends Factory
             'nama_asset' => fake()->words(2, true),
             'gambar' => 'assets/images/default.jpg', // default image path
             'deskripsi' => fake()->paragraph(),
-            'stok' => fake()->numberBetween(1, 10),
             'category_id' => Category::factory(), // This will create a category if none exists
         ];
     }

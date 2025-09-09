@@ -23,8 +23,8 @@ class Asset extends Model
         'kode_asset',
         'nama_asset',
         'gambar',
+        'qr_code',
         'deskripsi',
-        'stok',
         'category_id'
     ];
 }

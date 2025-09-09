@@ -81,18 +81,6 @@
                             @enderror
                         </div>
 
-                        <div class="form-group">
-                            <label for="stok">Stok</label>
-                            <input type="number" name="stok" id="stok"
-                                class="form-control @error('stok') is-invalid @enderror" value="{{ old('stok') }}"
-                                required min="1">
-                            @error('stok')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-
                         <div class="form-group mt-4">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Simpan
