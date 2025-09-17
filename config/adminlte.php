@@ -339,23 +339,6 @@ return [
             'icon' => 'fas fa-fw fa-users',
         ],
 
-        ['header' => 'TRANSAKSI'],
-        [
-            'text' => 'Peminjaman Asset',
-            'url' => 'admin/pinjam',
-            'icon' => 'fas fa-fw fa-handshake',
-        ],
-        [
-            'text' => 'Pengembalian Asset',
-            'url' => 'admin/pengembalian',
-            'icon' => 'fas fa-fw fa-undo',
-        ],
-        [
-            'text' => 'Laporan Kerusakan',
-            'url' => 'admin/kerusakan',
-            'icon' => 'fas fa-fw fa-tools',
-        ],
-
         ['header' => 'LAPORAN'],
         [
             'text' => 'Print Laporan',

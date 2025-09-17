@@ -1,23 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AssetController; // <-- PASTIKAN Controller ini di-import
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PeminjamController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\AssetAdminController;
 use App\Http\Controllers\Admin\PeminjamAdminController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AssetController;
 
-// Halaman Awal tanpa login
+// Halaman Awal (dashboard) tanpa login
 Route::get('/', function () {
     return view('public.dashboard');
-});
-
-// ROUTE UNTUK SCAN QR CODE (TAMBAHKAN INI)
-// Route ini publik, bisa diakses tanpa login
-
+})->name('public.dashboard');
 
 // Route buat ADMIN
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -26,35 +22,40 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Assets
     Route::resource('/admin/assets', AssetAdminController::class)->names('admin.assets');
-    Route::get('admin/asset/{kode_asset}', [AssetAdminController::class, 'showByQr'])->name('asset.qr.show');
+    Route::get('/admin/asset/{kode_asset}', [AssetAdminController::class, 'showByQr'])->name('asset.qr.show'); // Buat nampilin qr code
 
     // Kategori
     Route::resource('/admin/category', CategoryController::class)->names('categories');
 
     // Peminjam
-    Route::get('/admin/peminjam', [PeminjamController::class, 'index'])->name('admin.peminjam.index');
+    Route::resource('/admin/peminjam', PeminjamAdminController::class)->names('admin.peminjam');
 
+    // Custom routes untuk approve/reject/return di peminjam
+    Route::patch('/admin/peminjam/{id}/approve', [PeminjamAdminController::class, 'approve'])->name('admin.peminjam.approve');
+    Route::patch('/admin/peminjam/{id}/reject', [PeminjamAdminController::class, 'reject'])->name('admin.peminjam.reject');
+    Route::patch('/admin/peminjam/{id}/return', [PeminjamAdminController::class, 'return'])->name('admin.peminjam.return');
+    
     // Users
     Route::resource('/admin/user/users', UserController::class)->names('admin.users');
-
 });
 
-// Route untuk USER / Peminjam biasa
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
+// Route untuk yang udah login
 Route::middleware('auth')->group(function () {
+    // Dashboard untuk user yang sudah login
+    Route::get('/dashboard', function () {
+        return view('public.dashboard');
+    })->name('dashboard');
+
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Halaman daftar asset
-    Route::get('/daftar', [AssetController::class, 'index'])->name('assets.index');
+    Route::resource('/daftar_asset', AssetController::class)->names('assets');
 
     // Peminjam melakukan peminjaman
     Route::post('/peminjam', [PeminjamController::class, 'store'])->name('peminjam.store');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

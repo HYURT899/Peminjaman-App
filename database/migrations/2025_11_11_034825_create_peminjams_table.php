@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,10 +12,25 @@ return new class extends Migration
     {
         Schema::create('peminjams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Peminjam
-            $table->foreignId('asset_id')->constrained()->onDelete('cascade'); // Aset
+
+            // Ganti user_id dengan nama_peminjam
+            $table->string('nama_peminjam');
+
+            // Relasi ke asset tetap ada
+            $table->foreignId('asset_id')->constrained()->onDelete('cascade');
+
+            $table->integer('jumlah')->default(1);
             $table->date('tanggal_pinjam');
-            $table->date('tanggal_kembali')->nullable();
+            $table->text('keperluan');
+
+            $table->enum('status', ['menunggu', 'disetujui', 'ditolak', 'dikembalikan'])->default('menunggu');
+
+            // Ganti foreignId jadi string biasa
+            $table->string('disetujui_oleh')->nullable();
+            $table->timestamp('disetujui_pada')->nullable();
+
+            $table->text('catatan')->default('-');
+
             $table->timestamps();
         });
     }
@@ -26,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loans');
+        Schema::dropIfExists('peminjaman');
     }
 };

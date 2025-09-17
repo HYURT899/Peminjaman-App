@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Manajemen Assets')
+@section('title', 'Daftar Users')
 
 @section('content_header')
     <h1 class="text-xl text-bold">Kelola User</h1>

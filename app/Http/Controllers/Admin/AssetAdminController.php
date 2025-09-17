@@ -4,16 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Asset;
 use App\Models\Category;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Controller;
 use Endroid\QrCode\QrCode;
+use Illuminate\Http\Request;
+use Endroid\QrCode\Color\Color;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
-use Endroid\QrCode\Color\Color;
+use Illuminate\Support\Facades\Storage;
+use Endroid\QrCode\ErrorCorrectionLevel;
 
 class AssetAdminController extends Controller
 {
@@ -68,8 +68,9 @@ class AssetAdminController extends Controller
 
         // 2. Generate QR Code
         try {
-            $url = route('asset.qr.show', $asset->kode_asset);
+            $url = url('/daftar_asset/' . $asset->id);
 
+            // Check tempat penyimpanan kalau ga ada bikin baru
             if (!Storage::disk('public')->exists('qrcodes')) {
                 Storage::disk('public')->makeDirectory('qrcodes');
             }
@@ -79,7 +80,12 @@ class AssetAdminController extends Controller
             $writer = new PngWriter();
 
             // Buat objek QrCode (cara modern, pake named args — butuh PHP 8+)
-            $qrCode = new QrCode(data: $url, encoding: new Encoding('UTF-8'), errorCorrectionLevel: ErrorCorrectionLevel::High, size: 300, margin: 10, roundBlockSizeMode: RoundBlockSizeMode::Margin, foregroundColor: new Color(0, 0, 0), backgroundColor: new Color(255, 255, 255));
+            $qrCode = new QrCode(data: $url, encoding: new Encoding('UTF-8'), 
+                errorCorrectionLevel: ErrorCorrectionLevel::High, size: 300, margin: 10, 
+                roundBlockSizeMode: RoundBlockSizeMode::Margin, 
+                foregroundColor: new Color(0, 0, 0), 
+                backgroundColor: new Color(255, 255, 255)
+            );
 
             $result = $writer->write($qrCode);
 
@@ -145,7 +151,7 @@ class AssetAdminController extends Controller
         $asset->update([
             'kode_asset' => $request->kode_asset,
             'nama_asset' => $request->nama_asset,
-            'category_id' => $request->category_id, // TAMBAHKAN INI
+            'category_id' => $request->category_id,
             'gambar' => $path,
             'deskripsi' => $request->deskripsi,
         ]);

@@ -14,7 +14,7 @@ class AssetController extends Controller
     {
         $assets = Asset::paginate(8);
 
-        return view('public.index', compact('assets'));
+        return view('public.assets.index', compact('assets'));
     }
 
     /**
@@ -36,9 +36,10 @@ class AssetController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Asset $asset)
+    public function show($id)
     {
-        //
+        $asset = Asset::findOrFail($id);
+        return view('public.assets.show', compact('asset'));
     }
 
     /**

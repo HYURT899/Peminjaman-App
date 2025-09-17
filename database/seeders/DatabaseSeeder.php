@@ -21,8 +21,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            AdminSeeder::class,
-            AssetSeeder::class
+            AdminSeeder::class
         ]);
     }
 }

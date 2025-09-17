@@ -13,7 +13,7 @@
                 <div class="card-body">
                     <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Nama</label>
@@ -27,7 +27,8 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" id="password" name="password" class="form-control" required minlength="6">
+                                <input type="password" id="password" name="password" class="form-control" required
+                                    minlength="6">
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -39,7 +40,7 @@
                                 <label for="role" class="form-label">Role</label>
                                 <select id="role" name="role" class="form-control" required>
                                     <option value="" disabled selected>-- Pilih Role --</option>
-                                    @foreach($roleNames as $id => $name)
+                                    @foreach ($roleNames as $id => $name)
                                         <option value="{{ $id }}">{{ ucfirst($name) }}</option>
                                     @endforeach
                                 </select>
@@ -65,4 +66,33 @@
         </div>
     </div>
 </div>
+@stop
+
+@section('css')
+<style>
+    .required-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .required-label::after {
+        content: " *";
+        color: #dc3545;
+        /* Merah Bootstrap */
+        font-weight: bold;
+    }
+
+    /* Optional: Style untuk form groups */
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    /* Optional: Tooltip info */
+    .label-tooltip {
+        cursor: help;
+        border-bottom: 1px dotted #999;
+    }
+</style>
 @stop

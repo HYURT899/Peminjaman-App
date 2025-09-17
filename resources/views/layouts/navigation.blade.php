@@ -17,7 +17,7 @@
         <div class="collapse navbar-collapse mx-4" id="navbarSupportedContent">
             {{-- Left Side (Menu) --}}
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}">
+                <x-nav-link :active="request()->routeIs('public.dashboard')" href="{{ route('public.dashboard') }}">
                     Dashboard
                 </x-nav-link>
 
@@ -26,7 +26,7 @@
                 </x-nav-link>
 
                 @auth
-                    @if(Auth::user()->role === 'admin')
+                    @if(Auth::user()->role === 1) {{-- 1 artinya admin --}}
                         <x-nav-link :active="request()->routeIs('admin.dashboard')" href="{{ route('admin.dashboard') }}">
                             Dashboard Admin
                         </x-nav-link>

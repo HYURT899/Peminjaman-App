@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Daftar Asset')
+
 @section('content')
     <div class="container py-4">
         <h1 class="mb-4">Daftar Aset</h1>
@@ -16,9 +18,11 @@
             <div class="row">
                 @foreach ($assets as $asset)
                     <div class="col-md-3 mb-4">
-                        <div class="card h-100">
+                        <div class="card h-100 hover hover-5 rounded">
                             @if ($asset->gambar && file_exists(public_path($asset->gambar)))
+                            <a href="{{ route('assets.show', $asset->id) }}">
                                 <img src="{{ asset($asset->gambar) }}" class="card-img-top" alt="{{ $asset->nama_asset }}">
+                            </a>
                             @else
                                 <div class="d-flex align-items-center justify-content-center bg-light" style="height:200px;">
                                     <span class="text-muted">No image</span>
@@ -26,7 +30,7 @@
                             @endif
 
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">{{ $asset->nama_asset }}</h5>
+                                <a class="card-title link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ route('assets.show', $asset->id) }}">{{ $asset->nama_asset }}</a>
                                 @if ($asset->deskripsi)
                                     <p class="card-text text-muted">{{ Str::limit($asset->deskripsi, 80) }}</p>
                                 @endif
@@ -56,3 +60,12 @@
         @endif
     </div>
 @endsection
+
+@section('css')
+<style>
+    #nama:hover {
+        color: white;
+        text-decoration: underline
+    }
+</style>
+@stop

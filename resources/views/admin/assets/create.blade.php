@@ -16,7 +16,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="kode_asset">Kode Asset</label>
+                                    <label for="kode_asset" class="required-label">Kode Asset</label>
                                     <input type="text" name="kode_asset" id="kode_asset"
                                         class="form-control @error('kode_asset') is-invalid @enderror"
                                         value="{{ old('kode_asset') }}" required>
@@ -29,7 +29,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="nama_asset">Nama Asset</label>
+                                    <label for="nama_asset" class="required-label">Nama Asset</label>
                                     <input type="text" name="nama_asset" id="nama_asset"
                                         class="form-control @error('nama_asset') is-invalid @enderror"
                                         value="{{ old('nama_asset') }}" required>
@@ -43,7 +43,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="gambar">Gambar</label>
+                            <label for="gambar" class="required-label">Gambar</label>
                             <div class="custom-file">
                                 <input type="file" name="gambar" id="gambar"
                                     class="custom-file-input @error('gambar') is-invalid @enderror">
@@ -57,7 +57,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="deskripsi">Deskripsi</label>
+                            <label for="deskripsi" class="required-label">Deskripsi</label>
                             <textarea name="deskripsi" id="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror" rows="3">{{ old('deskripsi') }}</textarea>
                             @error('deskripsi')
                                 <span class="invalid-feedback" role="alert">
@@ -67,7 +67,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="category_id">Kategori</label>
+                            <label for="category_id" class="required-label">Kategori</label>
                             <select name="category_id" id="category_id" class="form-control" required>
                                 <option value="">Pilih Kategori</option>
                                 @foreach ($categories as $category)
@@ -120,6 +120,31 @@
         .btn {
             border-radius: 3px;
             padding: 8px 16px;
+        }
+
+        .required-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .required-label::after {
+            content: " *";
+            color: #dc3545;
+            /* Merah Bootstrap */
+            font-weight: bold;
+        }
+
+        /* Optional: Style untuk form groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        /* Optional: Tooltip info */
+        .label-tooltip {
+            cursor: help;
+            border-bottom: 1px dotted #999;
         }
     </style>
 @stop

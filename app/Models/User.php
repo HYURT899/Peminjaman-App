@@ -17,24 +17,14 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-protected $fillable = [
-    'name',
-    'email',
-    'password',
-    'jabatan',
-    'role',
-    'gambar'
-];
+    protected $fillable = ['name', 'email', 'password', 'jabatan', 'role', 'gambar'];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * Get the attributes that should be cast.
@@ -49,12 +39,16 @@ protected $fillable = [
         ];
     }
     public function Role()
-{
-    return $this->belongsTo(Role::class);
-}
-public function nama()
-{
-    return $this->belongsTo(\App\Models\Role::class, 'role');
-}
+    {
+        return $this->belongsTo(Role::class);
+    }
+    public function nama()
+    {
+        return $this->belongsTo(\App\Models\Role::class, 'role');
+    }
 
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjam::class);
+    }
 }
