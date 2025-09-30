@@ -16,7 +16,7 @@ Route::get('/', function () {
 })->name('public.dashboard');
 
 // Route buat ADMIN
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     // Dashboard
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
@@ -40,7 +40,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 // Route untuk yang udah login
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', )->group(function () {
     // Dashboard untuk user yang sudah login
     Route::get('/dashboard', function () {
         return view('public.dashboard');
