@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Dompdf\Options;
 use App\Models\Asset;
 use App\Models\Peminjam;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
+use PhpOffice\PhpWord\TemplateProcessor;
 
 class PeminjamAdminController extends Controller
 {
@@ -237,5 +240,41 @@ class PeminjamAdminController extends Controller
                 ->route('admin.peminjam.index')
                 ->with('error', 'Gagal update status pengembalian: ' . $e->getMessage());
         }
+    }
+
+    public function print($id)
+    {
+        // Ambil data peminjaman + asset
+        $peminjaman = Peminjam::with('asset')->findOrFail($id);
+
+        // Load template word
+        $template = new TemplateProcessor(storage_path('templates/form_peminjam.docx'));
+
+        // Set data ke template
+        $template->setValue('nama_peminjam', $peminjaman->nama_peminjam);
+        $template->setValue('nama_asset', $peminjaman->asset->nama_asset);
+        $template->setValue('jumlah', $peminjaman->jumlah);
+        $template->setValue('tanggal_pinjam', $peminjaman->tanggal_pinjam);
+        $template->setValue('keperluan', $peminjaman->keperluan);
+
+        // Nama file hasil
+        $fileName = 'peminjaman-' . $peminjaman->id . '.docx';
+        $path = storage_path($fileName);
+
+        // Simpan hasil
+        $template->saveAs($path);
+
+        // Download otomatis
+        return response()->download($path)->deleteFileAfterSend(true);
+    }
+
+    public function cetak($id)
+    {
+        $peminjam = Peminjam::with('asset')->findOrFail($id);
+
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $pdf = Pdf::loadView('admin.peminjam.cetak', compact('peminjam'));
+        return $pdf->stream('peminjam.pdf'); // << stream = preview dulu, bukan langsung download
     }
 }

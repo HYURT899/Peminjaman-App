@@ -1,24 +1,115 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard Admin')
+@section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard Admin</h1>
+    <h1>Dashboard Management Asset</h1>
 @stop
 
 @section('content')
     <div class="row">
+        {{-- Card Total Assets --}}
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
+            <div class="small-box bg-primary">
                 <div class="inner">
-                    <h3>150</h3>
-                    <p>Peminjaman</p>
+                    <h3>{{ $totalAssets }}</h3>
+                    <p>Total Assets</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-book"></i>
+                    <i class="fas fa-box"></i>
                 </div>
-                <a href="#" class="small-box-footer">Lihat Detail <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="{{ route('admin.assets.index') }}" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+
+        {{-- Bisa tambahin card lain di sini, misalnya jumlah kategori --}}
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ $kategori->count() }}</h3>
+                    <p>Total Kategori</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <a href="{{ route('categories.index') }}" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>{{ $totalPeminjams }}</h3>
+                    <p>Total Peminjam</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-user-alt"></i>
+                </div>
+                <a href="{{ route('admin.peminjam.index') }}" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
             </div>
         </div>
     </div>
+
+    {{-- Grafik & tabel --}}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card card-info">
+                <div class="card-header">
+                    <h3 class="card-title">Grafik Asset per Kategori</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="kategoriChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-warning">
+                <div class="card-header">
+                    <h3 class="card-title">Jumlah Asset per Kategori</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Kategori</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($kategori as $item)
+                                <tr>
+                                    <td>{{ $item->name }}</td>
+                                    <td>{{ $item->total }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+@stop
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('kategoriChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: @json($kategori->pluck('name')),
+                datasets: [{
+                    data: @json($kategori->pluck('total')),
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8'],
+                }]
+            }
+        });
+    </script>
 @stop

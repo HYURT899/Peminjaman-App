@@ -129,7 +129,7 @@
                         <div class="alert alert-info mt-3">
                             <strong>Info Approval:</strong><br>
                             Disetujui oleh: {{ $peminjaman->disetujuiOleh->name ?? 'Admin' }}<br>
-                            Pada: {{ $peminjaman->disetujui_pada->format('d/m/Y H:i') }}
+                            Pada: {{ $peminjaman->disetujui_pada }}
                         </div>
                         @endif
 

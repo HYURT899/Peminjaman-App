@@ -2,23 +2,26 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\AssetController;
+use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\AssetAdminController;
 use App\Http\Controllers\Admin\PeminjamAdminController;
-use App\Http\Controllers\AssetController;
 
 // Halaman Awal (dashboard) tanpa login
 Route::get('/', function () {
     return view('public.dashboard');
 })->name('public.dashboard');
 
+Route::get('/peminjaman/{id}/print', [PrintController::class, 'show'])->name('peminjaman.print');
+
 // Route buat ADMIN
 Route::middleware(['auth', 'admin'])->group(function () {
     // Dashboard
-    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin', [AdminController::class, 'dataDashboard'])->name('admin.dashboard');
 
     // Assets
     Route::resource('/admin/assets', AssetAdminController::class)->names('admin.assets');
@@ -29,6 +32,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Peminjam
     Route::resource('/admin/peminjam', PeminjamAdminController::class)->names('admin.peminjam');
+    Route::get('/admin/peminjam/{id}/print', [PeminjamAdminController::class, 'print'])->name('peminjam.print');
 
     // Custom routes untuk approve/reject/return di peminjam
     Route::patch('/admin/peminjam/{id}/approve', [PeminjamAdminController::class, 'approve'])->name('admin.peminjam.approve');

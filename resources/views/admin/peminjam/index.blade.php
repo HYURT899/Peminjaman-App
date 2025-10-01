@@ -68,14 +68,14 @@
                             <td>
                                 <div class="btn-group" role="group" aria-label="Basic example">
                                     <!-- TOMBOL DETAIL -->
-                                    <a href="{{ route('admin.peminjam.show', $pinjam->id) }}" class="btn btn-info btn-sm"
+                                    <a href="{{ route('admin.peminjam.show', $pinjam->id) }}" class="btn btn-info btn-sm rounded"
                                         title="Detail">
                                         <i class="fa fa-eye"></i>
                                     </a>
 
                                     <!-- TOMBOL EDIT -->
                                     <a href="{{ route('admin.peminjam.edit', $pinjam->id) }}"
-                                        class="btn btn-warning btn-sm" title="Edit">
+                                        class="btn btn-warning btn-sm rounded ml-1" title="Edit">
                                         <i class="fa fa-edit"></i>
                                     </a>
 
@@ -109,19 +109,31 @@
                                             style="display:inline-block;">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-primary btn-sm"
+                                            <button type="submit" class="btn btn-primary btn-sm ml-1"
                                                 title="Tandai Dikembalikan">
                                                 <i class="fa fa-undo"></i>
                                             </button>
                                         </form>
                                     @endif
 
+                                    @if ($pinjam->status == 'disetujui')
+                                        <a href="{{ route('peminjaman.print', $pinjam->id) }}" target="_blank" class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
+                                            <i class="fa fa-print"></i>
+                                        </a>
+                                    @endif
+
+                                    @if ($pinjam->status == 'disetujui')
+                                        <a href="{{ route('peminjam.print', $pinjam->id) }}" target="_blank" class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
+                                            <i class="fa fa-download"></i>
+                                        </a>
+                                    @endif
+
                                     <!-- TOMBOL DELETE -->
-                                    <form action="{{ route('admin.peminjam.destroy', $pinjam->id) }}" method="POST" onsubmit="return confirm('Yakin hapus asset ini?')"
-                                        style="display:inline-block;">
+                                    <form action="{{ route('admin.peminjam.destroy', $pinjam->id) }}" method="POST"
+                                        onsubmit="return confirm('Yakin hapus asset ini?')" style="display:inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm ml-1" title="Hapus">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </form>
