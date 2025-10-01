@@ -43,9 +43,10 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->jabatan }}</td>
-                            <td>@if ($user->role == 1)
-                                    <p>Admin</p>
-                                @endif
+                            <td>
+                                @foreach ($user->getRoleNames() as $role)
+                                    <span>{{ $role }}</span>
+                                @endforeach
                             </td>
                             <td>
                                 <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
@@ -53,7 +54,8 @@
                                     style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus user?')">Delete</button>
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Yakin hapus user?')">Delete</button>
                                 </form>
                             </td>
                         </tr>

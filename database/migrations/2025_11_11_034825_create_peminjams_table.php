@@ -29,7 +29,8 @@ return new class extends Migration {
             $table->string('disetujui_oleh')->nullable();
             $table->timestamp('disetujui_pada')->nullable();
 
-            $table->text('catatan')->default('-');
+            $table->String('catatan')->default('-');
+
 
             $table->timestamps();
         });

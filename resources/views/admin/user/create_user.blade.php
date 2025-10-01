@@ -40,8 +40,8 @@
                                 <label for="role" class="form-label">Role</label>
                                 <select id="role" name="role" class="form-control" required>
                                     <option value="" disabled selected>-- Pilih Role --</option>
-                                    @foreach ($roleNames as $id => $name)
-                                        <option value="{{ $id }}">{{ ucfirst($name) }}</option>
+                                    @foreach (Spatie\Permission\Models\Role::all() as $role)
+                                        <option value="{{ $role->name }}">{{ $role->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
