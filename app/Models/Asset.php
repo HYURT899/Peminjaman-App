@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\KeranjangPeminjaman;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Asset extends Model
 {
@@ -22,6 +23,10 @@ class Asset extends Model
     public function peminjaman()
     {
         return $this->hasMany(Peminjam::class);
+    }
+
+    public function keranjangPeminjam(){
+        return $this->hasMany(KeranjangPeminjaman::class);
     }
 
     protected $fillable = ['kode_asset', 'nama_asset', 'gambar', 'qr_code', 'deskripsi', 'category_id'];

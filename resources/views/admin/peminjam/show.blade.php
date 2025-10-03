@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Informasi Peminjaman</h3>
                     <div class="card-tools">
                         <a href="{{ route('admin.peminjam.edit', $peminjaman->id) }}" class="btn btn-warning btn-sm">
@@ -23,6 +23,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        {{-- KIRI: Info dasar + daftar asset per baris --}}
                         <div class="col-md-6">
                             <table class="table table-bordered">
                                 <tr>
@@ -33,23 +34,47 @@
                                     <th>Peminjam</th>
                                     <td>{{ $peminjaman->nama_peminjam }}</td>
                                 </tr>
+
+                                {{-- Asset yang Dipinjam: tampilkan semua item per baris --}}
                                 <tr>
                                     <th>Asset yang Dipinjam</th>
                                     <td>
-                                        {{ $peminjaman->asset->kode_asset }} - {{ $peminjaman->asset->nama_asset }}
-                                        @if($peminjaman->asset->gambar)
-                                            <br>
-                                            <img src="{{ asset('storage/' . $peminjaman->asset->gambar) }}" alt="Gambar Asset" class="img-thumbnail mt-2" style="max-height: 150px;">
+                                        @if (isset($allItems) && $allItems->isNotEmpty())
+                                            @foreach ($allItems as $item)
+                                                <div class="mb-3 pb-2 border-bottom">
+                                                    <div>
+                                                        <strong>{{ optional($item->asset)->kode_asset ?? '-' }}</strong>
+                                                        &nbsp; - &nbsp;
+                                                        {{ optional($item->asset)->nama_asset ?? '-' }}
+                                                        <span class="badge badge-secondary ml-2">{{ $item->jumlah }}
+                                                            unit</span>
+                                                    </div>
+
+                                                    {{-- gambar asset (jika ada) --}}
+                                                    @if (optional($item->asset)->gambar)
+                                                        <div class="mt-2">
+                                                            <img src="{{ asset('storage/' . $item->asset->gambar) }}"
+                                                                alt="Gambar Asset" class="img-thumbnail"
+                                                                style="max-height:120px;">
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <em>- Tidak ada asset terkait -</em>
                                         @endif
                                     </td>
                                 </tr>
+
+                                {{-- Total jumlah --}}
                                 <tr>
-                                    <th>Jumlah</th>
-                                    <td>{{ $peminjaman->jumlah }}</td>
+                                    <th>Total Jumlah</th>
+                                    <td>{{ $totalJumlah ?? ($allItems->sum('jumlah') ?? 0) }}</td>
                                 </tr>
                             </table>
                         </div>
-                        
+
+                        {{-- KANAN: Info tanggal, status, keperluan, catatan --}}
                         <div class="col-md-6">
                             <table class="table table-bordered">
                                 <tr>
@@ -59,12 +84,12 @@
                                 <tr>
                                     <th>Status</th>
                                     <td>
-                                        <span class="badge 
-                                            @if($peminjaman->status == 'menunggu') badge-warning
+                                        <span
+                                            class="badge 
+                                            @if ($peminjaman->status == 'menunggu') badge-warning
                                             @elseif($peminjaman->status == 'disetujui') badge-success
                                             @elseif($peminjaman->status == 'ditolak') badge-danger
-                                            @elseif($peminjaman->status == 'dikembalikan') badge-info
-                                            @endif">
+                                            @elseif($peminjaman->status == 'dikembalikan') badge-info @endif">
                                             {{ ucfirst($peminjaman->status) }}
                                         </span>
                                     </td>
@@ -81,26 +106,28 @@
                         </div>
                     </div>
 
-                    <!-- Informasi Approval -->
-                    @if($peminjaman->disetujui_oleh && $peminjaman->disetujui_pada)
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="alert alert-info">
-                                <h5><i class="fas fa-check-circle"></i> Informasi Approval</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <strong>Disetujui oleh:</strong> {{ $peminjaman->disetujuiOleh->name ?? 'Admin' }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <strong>Tanggal Approval:</strong> {{ $peminjaman->disetujui_pada }}
+                    {{-- Informasi Approval --}}
+                    @if ($peminjaman->disetujui_oleh || $peminjaman->disetujui_pada)
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <h5><i class="fas fa-check-circle"></i> Informasi Approval</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <strong>Disetujui oleh:</strong>
+                                            {{ optional($peminjaman->disetujuiOleh)->name ?? ($peminjaman->disetujui_oleh ?? 'Admin') }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Tanggal Approval:</strong>
+                                            {{ $peminjaman->disetujui_pada ?? '-' }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     @endif
 
-                    <!-- Timeline Status -->
+                    {{-- Timeline Status --}}
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <h5><i class="fas fa-history"></i> Timeline</h5>
@@ -108,35 +135,39 @@
                                 <li>
                                     <i class="fas fa-plus bg-blue"></i>
                                     <div class="timeline-item">
-                                        <span class="time"><i class="fas fa-clock"></i> {{ $peminjaman->created_at }}</span>
+                                        <span class="time"><i class="fas fa-clock"></i>
+                                            {{ $peminjaman->created_at }}</span>
                                         <h3 class="timeline-header">Peminjaman Diajukan</h3>
                                         <div class="timeline-body">
                                             Peminjaman dibuat oleh sistem
                                         </div>
                                     </div>
                                 </li>
-                                
-                                @if($peminjaman->disetujui_pada)
-                                <li>
-                                    <i class="fas fa-check bg-green"></i>
-                                    <div class="timeline-item">
-                                        <span class="time"><i class="fas fa-clock"></i> {{ $peminjaman->disetujui_pada }}</span>
-                                        <h3 class="timeline-header">Peminjaman Disetujui</h3>
-                                        <div class="timeline-body">
-                                            Disetujui oleh {{ $peminjaman->disetujuiOleh->name ?? 'Admin' }}
+
+                                @if ($peminjaman->disetujui_pada)
+                                    <li>
+                                        <i class="fas fa-check bg-green"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i>
+                                                {{ $peminjaman->disetujui_pada }}</span>
+                                            <h3 class="timeline-header">Peminjaman Disetujui</h3>
+                                            <div class="timeline-body">
+                                                Disetujui oleh
+                                                {{ optional($peminjaman->disetujuiOleh)->name ?? ($peminjaman->disetujui_oleh ?? 'Admin') }}
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
                                 @endif
-                                
+
                                 <li>
                                     <i class="fas fa-clock bg-gray"></i>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                </div>
-            </div>
+
+                </div> {{-- /.card-body --}}
+            </div> {{-- /.card --}}
         </div>
     </div>
 @stop
@@ -152,11 +183,11 @@
         .card-header {
             background-color: #f8f9fa;
             border-bottom: 1px solid #d2d6de;
-            padding: 15px 20px;
+            padding: 12px 16px;
         }
 
         .card-body {
-            padding: 20px;
+            padding: 16px;
         }
 
         .table th {
@@ -164,11 +195,11 @@
         }
 
         .badge {
-            padding: 0.5em 0.8em;
-            font-size: 0.9em;
+            padding: 0.35em 0.6em;
+            font-size: 0.85em;
         }
 
-        /* Timeline CSS */
+        /* Timeline */
         .timeline {
             position: relative;
             margin: 0 0 30px 0;
@@ -188,35 +219,13 @@
             border-radius: 2px;
         }
 
-        .timeline > li {
+        .timeline>li {
             position: relative;
             margin-right: 10px;
             margin-bottom: 15px;
         }
 
-        .timeline > li:before,
-        .timeline > li:after {
-            content: " ";
-            display: table;
-        }
-
-        .timeline > li:after {
-            clear: both;
-        }
-
-        .timeline > li > .timeline-item {
-            margin-left: 60px;
-            margin-right: 15px;
-            margin-top: 0;
-            background: #fff;
-            color: #444;
-            padding: 10px;
-            position: relative;
-            border-radius: 3px;
-            border: 1px solid #ddd;
-        }
-
-        .timeline > li > .fa {
+        .timeline>li>.fa {
             width: 30px;
             height: 30px;
             font-size: 15px;
@@ -230,7 +239,19 @@
             top: 0;
         }
 
-        .timeline > li .timeline-header {
+        .timeline>li>.timeline-item {
+            margin-left: 60px;
+            margin-right: 15px;
+            margin-top: 0;
+            background: #fff;
+            color: #444;
+            padding: 10px;
+            position: relative;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+
+        .timeline>li .timeline-header {
             margin: 0;
             color: #555;
             border-bottom: 1px solid #f4f4f4;
@@ -239,26 +260,26 @@
             line-height: 1.1;
         }
 
-        .timeline > li .timeline-body,
-        .timeline > li .timeline-footer {
+        .timeline>li .timeline-body,
+        .timeline>li .timeline-footer {
             padding: 10px;
         }
 
-        .timeline > li .time {
+        .timeline>li .time {
             float: right;
             color: #999;
             font-size: 12px;
         }
 
-        .timeline > li .bg-blue {
+        .timeline>li .bg-blue {
             background-color: #007bff !important;
         }
 
-        .timeline > li .bg-green {
+        .timeline>li .bg-green {
             background-color: #28a745 !important;
         }
 
-        .timeline > li .bg-gray {
+        .timeline>li .bg-gray {
             background-color: #6c757d !important;
         }
     </style>

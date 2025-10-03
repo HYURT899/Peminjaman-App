@@ -54,46 +54,63 @@
                 </a>
             </div>
         </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ $totalUsers }}</h3>
+                    <p>Total User</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-address-card"></i>
+                </div>
+                <a href="{{ route('admin.users.index') }}" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
     </div>
 
     {{-- Grafik & tabel --}}
     <div class="row">
         <div class="col-md-6">
             <div class="card card-info">
-                <div class="card-header">
-                    <h3 class="card-title">Grafik Asset per Kategori</h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="kategoriChart"></canvas>
-                </div>
+            <div class="card-header">
+                <h3 class="card-title">Grafik Asset per Kategori</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="kategoriChart" style="width:100%; height:60vh; max-height:345px;"></canvas>
+            </div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card card-warning">
-                <div class="card-header">
-                    <h3 class="card-title">Jumlah Asset per Kategori</h3>
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
+    <div class="card card-warning">
+        <div class="card-header">
+            <h3 class="card-title">Jumlah Asset per Kategori</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 385px; overflow-y: auto;">
+                <table class="table table-bordered mb-0">
+                    <thead class="sticky-top" style="background-color: #ffff;">
+                        <tr>
+                            <th>Kategori</th>
+                            <th>Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($kategori as $item)
                             <tr>
-                                <th>Kategori</th>
-                                <th>Jumlah</th>
+                                <td>{{ $item->name }}</td>
+                                <td>{{ $item->total }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($kategori as $item)
-                                <tr>
-                                    <td>{{ $item->name }}</td>
-                                    <td>{{ $item->total }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
+</div>
     </div>
 @stop
 

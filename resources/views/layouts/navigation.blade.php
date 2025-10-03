@@ -3,7 +3,7 @@
         {{-- Logo --}}
         <a class="navbar-brand text-dark" href="{{ route('dashboard') }}">
             {{-- Ganti dengan logo atau nama aplikasi --}}
-            <img src="{{ asset ('images/logo fps-01.png') }}" alt="logo" width="35">
+            <img src="{{ asset('images/logo fps-01.png') }}" alt="logo" width="35">
             {{ config('app.name', 'Laravel') }}
         </a>
 
@@ -26,7 +26,8 @@
                 </x-nav-link>
 
                 @auth
-                    @if(Auth::user()->role === 1) {{-- 1 artinya admin --}}
+                    @if (Auth::id() === 1)
+                        {{-- 1 artinya admin --}}
                         <x-nav-link :active="request()->routeIs('admin.dashboard')" href="{{ route('admin.dashboard') }}">
                             Dashboard Admin
                         </x-nav-link>
@@ -63,6 +64,20 @@
                         <a class="nav-link text-black fw-bold" href="{{ route('login') }}">Login</a>
                     </li>
                 @endauth
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {{-- Tombol keranjang hanya muncul kalau ada isi --}}
+                @if ($countKeranjang > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('keranjang.index') }}" class="btn btn-outline-primary position-relative">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ $countKeranjang }}
+                            </span>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </div>
     </div>

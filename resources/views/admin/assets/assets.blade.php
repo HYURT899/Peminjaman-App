@@ -135,7 +135,7 @@
         $(function() {
             // Initialize DataTable
             var table = $('#assetTable').DataTable({
-                pageLength: 8,
+                pageLength: 10,
                 lengthChange: true,
                 ordering: true,
                 searching: true,

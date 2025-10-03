@@ -2,26 +2,51 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Dompdf\Options;
 use App\Models\Asset;
 use App\Models\Peminjam;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\User;
-use PhpOffice\PhpWord\TemplateProcessor;
 
 class PeminjamAdminController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    // Di Controller - index method
     public function index()
     {
-        $peminjam = Peminjam::all();
+        // ambil semua peminjaman beserta relasi asset
+        $peminjam = Peminjam::with('asset')
+            ->get()
+            ->groupBy('nama_peminjam') // grup per nama peminjam
+            ->map(function ($group) {
+                // buat array string per asset: "NamaAsset - KODE (jumlah)"
+                $assetsLines = $group->map(function ($item) {
+                    $assetName = optional($item->asset)->nama_asset ?? '-';
+                    $assetCode = optional($item->asset)->kode_asset ?? '-';
+                    return $assetName . ' - ' . $assetCode . ' <strong>(' . $item->jumlah . ')</strong>';
+                })->toArray();
+
+                return (object) [
+                    'nama_peminjam'  => $group->first()->nama_peminjam,
+                    'assets'         => implode('<br>', $assetsLines), // nanti diberi {!! !!} di blade
+                    'total_jumlah'   => $group->sum('jumlah'), // total semua jumlah
+                    'tanggal_pinjam' => $group->first()->tanggal_pinjam, // ambil salah satu (bisa diubah jadi min/max)
+                    'keperluan'      => $group->pluck('keperluan')->unique()->implode(', '),
+                    'status'         => $group->first()->status, // aturan: ambil yang pertama (ubah sesuai kebutuhan)
+                    'id'             => $group->first()->id, // id dari salah satu record (dipakai untuk tombol CRUD)
+                    'ids'            => $group->pluck('id')->toArray(), // kalau mau list detail tiap item
+                ];
+            })
+            // jika mau dijadikan koleksi biasa (opsional)
+            ->values();
+
         return view('admin.peminjam.index', compact('peminjam'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -87,9 +112,18 @@ class PeminjamAdminController extends Controller
      */
     public function show(string $id)
     {
-        $peminjaman = Peminjam::with(['asset'])->findOrFail($id);
+        // Ambil satu record (dipakai untuk header/detail umum)
+        $peminjaman = Peminjam::with('asset')->findOrFail($id);
 
-        return view('admin.peminjam.show', compact('peminjaman'));
+        // Ambil semua peminjaman yang punya nama_peminjam sama (semua item milik user tersebut)
+        $allItems = Peminjam::with('asset')
+            ->where('nama_peminjam', $peminjaman->nama_peminjam)
+            ->get();
+
+        // Total jumlah semua item (opsional, kalau mau ditampilkan)
+        $totalJumlah = $allItems->sum('jumlah');
+
+        return view('admin.peminjam.show', compact('peminjaman', 'allItems', 'totalJumlah'));
     }
 
     /**
@@ -168,113 +202,55 @@ class PeminjamAdminController extends Controller
         return redirect()->route('admin.peminjam.index')->with('success', 'Peminjam berhasil dihapus!');
     }
 
-    // APPROVE peminjaman
-    public function approve($id)
+    public function approve($nama)
     {
-        try {
-            DB::beginTransaction();
-
-            $peminjaman = Peminjam::findOrFail($id);
-
-            $peminjaman->update([
+        Peminjam::where('nama_peminjam', $nama)
+            ->where('status', 'menunggu')
+            ->update([
                 'status' => 'disetujui',
-                'disetujui_oleh' => auth()->name ?? 'Admin', // Simpan nama admin yang approve
-                'disetujui_pada' => now(),
+                'disetujui_oleh' => Auth::user()->name ?? 'Admin',
+                'disetujui_pada' => now()
             ]);
 
-            DB::commit();
-
-            return redirect()->route('admin.peminjam.index')->with('success', 'Peminjaman berhasil disetujui!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->route('admin.peminjam.index')
-                ->with('error', 'Gagal menyetujui peminjaman: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', "Semua peminjaman oleh {$nama} disetujui!");
     }
 
-    // REJECT peminjaman
-    public function reject($id)
+    public function reject($nama)
     {
-        try {
-            DB::beginTransaction();
+        Peminjam::where('nama_peminjam', $nama)
+            ->where('status', 'menunggu')
+            ->update(['status' => 'ditolak']);
 
-            $peminjaman = Peminjam::findOrFail($id);
-
-            $peminjaman->update([
-                'status' => 'ditolak',
-                'disetujui_oleh' => auth()->name ?? 'Admin', // Simpan nama admin yang reject
-                'disetujui_pada' => now(),
-            ]);
-
-            DB::commit();
-
-            return redirect()->route('admin.peminjam.index')->with('success', 'Peminjaman berhasil ditolak!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->route('admin.peminjam.index')
-                ->with('error', 'Gagal menolak peminjaman: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', "Semua peminjaman oleh {$nama} ditolak!");
     }
 
-    // RETURN peminjaman (tandai sudah dikembalikan)
-    public function return($id)
+    public function return($nama)
     {
-        try {
-            DB::beginTransaction();
+        Peminjam::where('nama_peminjam', $nama)
+            ->where('status', 'disetujui')
+            ->update(['status' => 'dikembalikan']);
 
-            $peminjaman = Peminjam::findOrFail($id);
-
-            $peminjaman->update([
-                'status' => 'dikembalikan',
-                // disetujui_oleh tidak diubah karena sudah ada dari sebelumnya
-            ]);
-
-            DB::commit();
-
-            return redirect()->route('admin.peminjam.index')->with('success', 'Peminjaman berhasil ditandai sebagai dikembalikan!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->route('admin.peminjam.index')
-                ->with('error', 'Gagal update status pengembalian: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', "Semua peminjaman oleh {$nama} ditandai sebagai dikembalikan!");
     }
 
-    public function print($id)
+    public function print(string $id)
     {
-        // Ambil data peminjaman + asset
+        // ambil 1 record (dipakai untuk meta seperti nama peminjam, tanggal dsb)
         $peminjaman = Peminjam::with('asset')->findOrFail($id);
 
-        // Load template word
-        $template = new TemplateProcessor(storage_path('templates/form_peminjam.docx'));
+        // ambil semua peminjaman yang punya nama_peminjam sama
+        $allPeminjaman = Peminjam::with('asset')
+            ->where('nama_peminjam', $peminjaman->nama_peminjam)
+            ->get();
 
-        // Set data ke template
-        $template->setValue('nama_peminjam', $peminjaman->nama_peminjam);
-        $template->setValue('nama_asset', $peminjaman->asset->nama_asset);
-        $template->setValue('jumlah', $peminjaman->jumlah);
-        $template->setValue('tanggal_pinjam', $peminjaman->tanggal_pinjam);
-        $template->setValue('keperluan', $peminjaman->keperluan);
+        // buat string seperti: "1 CCTV, 2 Tangga, 3 Laptop"
+        $assetsText = $allPeminjaman->map(function ($item) {
+            $assetName = optional($item->asset)->nama_asset ?? '-';
+            // pastikan ada spasi setelah jumlah: "2 Tangga"
+            return $item->jumlah . ' ' . $assetName;
+        })->implode(', ');
 
-        // Nama file hasil
-        $fileName = 'peminjaman-' . $peminjaman->id . '.docx';
-        $path = storage_path($fileName);
-
-        // Simpan hasil
-        $template->saveAs($path);
-
-        // Download otomatis
-        return response()->download($path)->deleteFileAfterSend(true);
-    }
-
-    public function cetak($id)
-    {
-        $peminjam = Peminjam::with('asset')->findOrFail($id);
-
-        $options = new Options();
-        $options->set('defaultFont', 'Arial');
-        $pdf = Pdf::loadView('admin.peminjam.cetak', compact('peminjam'));
-        return $pdf->stream('peminjam.pdf'); // << stream = preview dulu, bukan langsung download
+        // kirim semuanya ke view
+        return view('admin.peminjam.print', compact('peminjaman', 'allPeminjaman', 'assetsText'));
     }
 }

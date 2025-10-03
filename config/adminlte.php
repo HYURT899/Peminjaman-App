@@ -339,11 +339,11 @@ return [
             'icon' => 'fas fa-fw fa-users',
         ],
 
-        ['header' => 'LAPORAN'],
+        ['header' => 'MISC'],
         [
-            'text' => 'Print Laporan',
-            'url' => 'admin/laporan',
-            'icon' => 'fas fa-fw fa-print',
+            'text' => 'Halaman Depan',
+            'url' => '/dashboard',
+            'icon' => 'fa fa-home',
         ],
     ],
 

@@ -20,31 +20,31 @@
                     <div class="col-md-3 mb-4">
                         <div class="card h-100 hover hover-5 rounded">
                             @if ($asset->gambar && file_exists(public_path($asset->gambar)))
-                            <a href="{{ route('assets.show', $asset->id) }}">
-                                <img src="{{ asset($asset->gambar) }}" class="card-img-top" alt="{{ $asset->nama_asset }}">
-                            </a>
+                                <a href="{{ route('assets.show', $asset->id) }}">
+                                    <img src="{{ asset($asset->gambar) }}" class="card-img-top"
+                                        alt="{{ $asset->nama_asset }}">
+                                </a>
                             @else
-                                <div class="d-flex align-items-center justify-content-center bg-light" style="height:200px;">
+                                <div class="d-flex align-items-center justify-content-center bg-light"
+                                    style="height:200px;">
                                     <span class="text-muted">No image</span>
                                 </div>
                             @endif
 
                             <div class="card-body d-flex flex-column">
-                                <a class="card-title link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ route('assets.show', $asset->id) }}">{{ $asset->nama_asset }}</a>
+                                <a class="card-title link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
+                                    href="{{ route('assets.show', $asset->id) }}">{{ $asset->nama_asset }}</a>
                                 @if ($asset->deskripsi)
                                     <p class="card-text text-muted">{{ Str::limit($asset->deskripsi, 80) }}</p>
                                 @endif
-
                                 <div class="mt-auto">
-                                    <form action="{{ route('peminjam.store') }}" method="POST">
+                                    <form action="{{ route('keranjang.add') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="asset_id" value="{{ $asset->id }}">
-                                        <button type="button" class="btn btn-primary btn-sm w-100" data-bs-toggle="modal"
-                                            data-bs-target="#modalPeminjaman" data-barang-id="{{ $asset->id }}"
-                                            data-barang-nama="{{ $asset->nama_asset }}">
-                                            Pinjam
+                                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                                            <i class="fas fa-cart-plus pl-3"></i>
+                                            Tambah ke Peminjaman
                                         </button>
-                                        @include('layouts.modalMinjam')
                                     </form>
                                 </div>
                             </div>
@@ -62,10 +62,10 @@
 @endsection
 
 @section('css')
-<style>
-    #nama:hover {
-        color: white;
-        text-decoration: underline
-    }
-</style>
+    <style>
+        #nama:hover {
+            color: white;
+            text-decoration: underline
+        }
+    </style>
 @stop

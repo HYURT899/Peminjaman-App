@@ -3,11 +3,23 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\KeranjangPeminjaman;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Testing\Fluent\Concerns\Has;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+
+
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection|KeranjangPeminjaman[] $keranjangPeminjam
+ * @property-read \Illuminate\Database\Eloquent\Collection|Peminjam[] $peminjaman
+ */
+
 
 class User extends Authenticatable
 {
@@ -52,5 +64,9 @@ class User extends Authenticatable
     public function peminjaman()
     {
         return $this->hasMany(Peminjam::class);
+    }
+
+    public function keranjangPeminjam(){
+        return $this->hasMany(KeranjangPeminjaman::class);
     }
 }

@@ -10,16 +10,12 @@ use App\Http\Controllers\Controller;
 
 class AdminController extends Controller
 {
-    public function dashboard()
-    {
-        return view('admin.dashboard');
-    }
-
     public function dataDashboard()
     {
         // Hitung jumlah asset dan peminjam
         $totalAssets = DB::table('assets')->count();
         $totalPeminjams = Peminjam::distinct('nama_peminjam')->count('nama_peminjam');
+        $totalUsers = DB::table('users')->count();
 
         // Hitung asset per kategori
         $kategori = DB::table('assets')
@@ -28,6 +24,6 @@ class AdminController extends Controller
             ->groupBy('categories.name')
             ->get();
 
-        return view('admin.dashboard', compact('totalAssets', 'kategori', 'totalPeminjams'));
+        return view('admin.dashboard', compact('totalAssets', 'kategori', 'totalPeminjams', 'totalUsers'));
     }
 }

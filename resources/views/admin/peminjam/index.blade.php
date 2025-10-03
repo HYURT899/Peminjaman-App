@@ -30,12 +30,12 @@
     <div class="container-fluid my-4">
         <div class="table-responsive">
             <table id="peminjamanTable" class="table table-hover table-bordered w-100" width="100%">
-                <thead>
+                <thead class="thead-light">
                     <tr>
                         <th>No</th>
                         <th>Peminjam</th>
                         <th>Asset</th>
-                        <th>Jumlah</th>
+                        <th>Jumlah total</th>
                         <th>Tgl Pinjam</th>
                         <th>Keperluan</th>
                         <th>Status</th>
@@ -43,88 +43,91 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $no = 1; @endphp
-                    @foreach ($peminjam as $i => $pinjam)
+                    @foreach ($peminjam as $pinjam)
                         <tr class="table-light">
-                            <td class="bulk-checkbox d-none">
-                                <input type="checkbox" class="checkbox-item" value="{{ $pinjam->id }}">
-                            </td>
-                            <td>{{ $no++ }}</td>
+                            <td>{{ $loop->iteration }}</td>
+
+                            {{-- Nama peminjam --}}
                             <td>{{ $pinjam->nama_peminjam }}</td>
-                            <td>{{ $pinjam->asset->nama_asset }} ({{ $pinjam->asset->kode_asset }})</td>
-                            <td>{{ $pinjam->jumlah }}</td>
+
+                            {{-- Asset: tampilkan per baris --}}
+                            <td>{!! $pinjam->assets !!}</td>
+
+                            {{-- Jumlah total (jika masih mau menunjukkan total) --}}
+                            <td>{{ $pinjam->total_jumlah }}</td>
+
+                            {{-- Tanggal pinjam --}}
                             <td>{{ $pinjam->tanggal_pinjam }}</td>
-                            <td>{{ Str::limit($pinjam->keperluan, 30) }}</td>
+
+                            {{-- Keperluan (gabungan unik) --}}
+                            <td>{{ Str::limit($pinjam->keperluan, 50) }}</td>
+
+                            {{-- Status --}}
                             <td>
                                 <span
                                     class="badge 
-                                    @if ($pinjam->status == 'menunggu') badge-warning
-                                    @elseif($pinjam->status == 'disetujui') badge-success
-                                    @elseif($pinjam->status == 'ditolak') badge-danger
-                                    @elseif($pinjam->status == 'dikembalikan') badge-info @endif">
+                                        @if ($pinjam->status == 'menunggu') badge-warning
+                                        @elseif($pinjam->status == 'disetujui') badge-success
+                                        @elseif($pinjam->status == 'ditolak') badge-danger
+                                        @elseif($pinjam->status == 'dikembalikan') badge-info @endif">
                                     {{ ucfirst($pinjam->status) }}
                                 </span>
                             </td>
+
+                            {{-- Aksi --}}
                             <td>
                                 <div class="btn-group" role="group" aria-label="Basic example">
-                                    <!-- TOMBOL DETAIL -->
-                                    <a href="{{ route('admin.peminjam.show', $pinjam->id) }}" class="btn btn-info btn-sm rounded"
+                                    {{-- Aksi utama mengarah ke salah satu record (first) --}}
+                                    <a href="{{ route('admin.peminjam.show', $pinjam->id) }}" class="btn btn-info btn-sm"
                                         title="Detail">
                                         <i class="fa fa-eye"></i>
                                     </a>
-
-                                    <!-- TOMBOL EDIT -->
                                     <a href="{{ route('admin.peminjam.edit', $pinjam->id) }}"
-                                        class="btn btn-warning btn-sm rounded ml-1" title="Edit">
+                                        class="btn btn-warning btn-sm ml-1" title="Edit">
                                         <i class="fa fa-edit"></i>
                                     </a>
 
-                                    <!-- TOMBOL APPROVE (hanya untuk status menunggu) -->
+                                    {{-- APPROVE ALL --}}
                                     @if ($pinjam->status == 'menunggu')
-                                        <form action="{{ route('admin.peminjam.approve', $pinjam->id) }}" method="POST"
-                                            style="display:inline-block;">
+                                        <form action="{{ route('admin.peminjam.approve', $pinjam->nama_peminjam) }}"
+                                            method="POST" style="display:inline-block;"
+                                            onsubmit="return confirm('Yakin ingin menyetujui semua peminjaman dari {{ $pinjam->nama_peminjam }}?')">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-success btn-sm" title="Setujui">
-                                                <i class="fa fa-check"></i>
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fa fa-check"></i> Approve Semua
                                             </button>
                                         </form>
                                     @endif
 
-                                    <!-- TOMBOL REJECT (hanya untuk status menunggu) -->
+                                    {{-- REJECT ALL --}}
                                     @if ($pinjam->status == 'menunggu')
-                                        <form action="{{ route('admin.peminjam.reject', $pinjam->id) }}" method="POST"
-                                            style="display:inline-block;">
+                                        <form action="{{ route('admin.peminjam.reject', $pinjam->nama_peminjam) }}"
+                                            method="POST" style="display:inline-block;">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Tolak">
-                                                <i class="fa fa-times"></i>
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-times"></i> Reject Semua
                                             </button>
                                         </form>
                                     @endif
 
-                                    <!-- TOMBOL RETURN (hanya untuk status disetujui) -->
+                                    {{-- RETURN ALL --}}
                                     @if ($pinjam->status == 'disetujui')
-                                        <form action="{{ route('admin.peminjam.return', $pinjam->id) }}" method="POST"
-                                            style="display:inline-block;">
+                                        <form action="{{ route('admin.peminjam.return', $pinjam->nama_peminjam) }}"
+                                            method="POST" style="display:inline-block;">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-primary btn-sm ml-1"
-                                                title="Tandai Dikembalikan">
-                                                <i class="fa fa-undo"></i>
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fa fa-undo" title="Return"></i> 
                                             </button>
                                         </form>
                                     @endif
 
+                                    {{-- PRINT ALL --}}
                                     @if ($pinjam->status == 'disetujui')
-                                        <a href="{{ route('peminjaman.print', $pinjam->id) }}" target="_blank" class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
-                                            <i class="fa fa-print"></i>
-                                        </a>
-                                    @endif
-
-                                    @if ($pinjam->status == 'disetujui')
-                                        <a href="{{ route('peminjam.print', $pinjam->id) }}" target="_blank" class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
-                                            <i class="fa fa-download"></i>
+                                        <a href="{{ route('admin.peminjam.cetak', $pinjam->id) }}" target="_blank" class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
+                                            <i class="fa fa-print"title="Print"></i>
                                         </a>
                                     @endif
 
@@ -142,6 +145,7 @@
                         </tr>
                     @endforeach
                 </tbody>
+
             </table>
         </div>
     </div>
@@ -194,7 +198,7 @@
                 },
                 "columnDefs": [{
                     "orderable": false,
-                    "targets": [0, 8] // kolom checkbox + aksi
+                    "targets": [0, 7] // kolom checkbox + aksi
                 }]
             });
 
