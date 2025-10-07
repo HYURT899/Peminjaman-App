@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\ProfileController;
@@ -11,10 +12,7 @@ use App\Http\Controllers\Admin\AssetAdminController;
 use App\Http\Controllers\Admin\PeminjamAdminController;
 use App\Http\Controllers\KeranjangPeminjamanController;
 
-// Halaman Awal (dashboard) tanpa login
-Route::get('/', function () {
-    return view('public.dashboard');
-})->name('public.dashboard');
+Route::redirect('/','login');
 
 // Route buat ADMIN
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -43,9 +41,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // Route untuk yang udah login
 Route::middleware('auth',)->group(function () {
     // Dashboard untuk user yang sudah login
-    Route::get('/dashboard', function () {
-        return view('public.dashboard');
-    })->name('dashboard');
+    Route::get(
+        '/dashboard',
+        [HomeController::class, 'index']
+    )->name('dashboard');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

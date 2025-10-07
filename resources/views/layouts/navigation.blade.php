@@ -17,7 +17,7 @@
         <div class="collapse navbar-collapse mx-4" id="navbarSupportedContent">
             {{-- Left Side (Menu) --}}
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <x-nav-link :active="request()->routeIs('public.dashboard')" href="{{ route('public.dashboard') }}">
+                <x-nav-link :active="request()->routeIs('public.dashboard')" href="{{ route('dashboard') }}">
                     Dashboard
                 </x-nav-link>
 

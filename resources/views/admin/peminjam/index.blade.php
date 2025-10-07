@@ -94,8 +94,8 @@
                                             onsubmit="return confirm('Yakin ingin menyetujui semua peminjaman dari {{ $pinjam->nama_peminjam }}?')">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="fa fa-check"></i> Approve Semua
+                                            <button type="submit" class="btn btn-success btn-sm ml-1">
+                                                <i class="fa fa-check"></i>
                                             </button>
                                         </form>
                                     @endif
@@ -107,7 +107,7 @@
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-times"></i> Reject Semua
+                                                <i class="fa fa-times"></i>
                                             </button>
                                         </form>
                                     @endif
