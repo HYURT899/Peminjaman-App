@@ -133,7 +133,7 @@
                             <h5><i class="fas fa-history"></i> Timeline</h5>
                             <ul class="timeline">
                                 <li>
-                                    <i class="fas fa-plus bg-blue"></i>
+                                    <i class="fa fa-plus bg-blue"></i>
                                     <div class="timeline-item">
                                         <span class="time"><i class="fas fa-clock"></i>
                                             {{ $peminjaman->created_at }}</span>
@@ -146,7 +146,7 @@
 
                                 @if ($peminjaman->disetujui_pada)
                                     <li>
-                                        <i class="fas fa-check bg-green"></i>
+                                        <i class="fa fa-check bg-green"></i>
                                         <div class="timeline-item">
                                             <span class="time"><i class="fas fa-clock"></i>
                                                 {{ $peminjaman->disetujui_pada }}</span>
@@ -159,9 +159,28 @@
                                     </li>
                                 @endif
 
-                                <li>
-                                    <i class="fas fa-clock bg-gray"></i>
-                                </li>
+                                @if ($peminjaman->dikembalikan_pada)
+                                    <li>
+                                        <i class="fa fa-undo bg-red"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i>
+                                                {{ $peminjaman->dikembalikan_pada }}</span>
+                                            <h3 class="timeline-header">Asset Dikembalikan</h3>
+                                            <div class="timeline-body">
+                                                Dikembalikan pada
+                                                {{ optional($peminjaman->dikembalikanPada)->name ?? ($peminjaman->dikembalikan_pada ?? now()) }}
+                                            </div>
+                                        </div>
+                                    </li>
+                                @endif
+
+                                @if ($peminjaman->dikembalikan_pada)
+                                    {{-- Kosong --}}
+                                @else
+                                    <li>
+                                        <i class="fa fa-clock bg-gray"></i>
+                                    </li>
+                                @endif
                             </ul>
                         </div>
                     </div>
