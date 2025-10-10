@@ -69,17 +69,14 @@
                             <td>{{ $item->kategori->name ?? ($item->category->name ?? 'Tidak ada kategori') }}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a href="{{ route('admin.assets.show', $item->id) }}" class="btn btn-info btn-sm mr-2"
-                                        title="Detail">
+                                    <a href="{{ route('admin.assets.show', $item->id) }}" class="btn btn-info btn-sm mr-2" title="Detail">
                                         <i class="fa fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.assets.edit', $item->id) }}"
-                                        class="btn btn-warning btn-sm mr-2" title="Edit">
+                                    <a href="{{ route('admin.assets.edit', $item->id) }}" class="btn btn-warning btn-sm mr-2" title="Edit">
                                         <i class="fa fa-edit"></i>
                                     </a>
                                     @if ($item->qr_code)
-                                        <a href="{{ asset('storage/' . $item->qr_code) }}"
-                                            class="btn btn-secondary btn-sm mr-2"
+                                        <a href="{{ asset('storage/' . $item->qr_code) }}" class="btn btn-secondary btn-sm mr-2"
                                             download="qrcode-{{ $item->kode_asset }}.png" title="Download QR Code">
                                             <i class="fa fa-download"></i>
                                         </a>

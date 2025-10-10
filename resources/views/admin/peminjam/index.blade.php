@@ -19,12 +19,13 @@
                 <option value="dikembalikan">Dikembalikan</option>
             </select>
         </div>
-        <div>
+        {{-- <div>
             <a href="{{ route('admin.peminjam.create') }}" class="btn btn-primary btn-around">
                 <i class="fa fa-plus pr-2"></i>
                 Tambah Data
             </a>
-        </div>
+        </div> --}}
+        {{-- Tombol di disable/dihilangkan request dari Mas Raga karena admin tidak bisa meminjam hanya user --}}
     </div>
 
     <div class="container-fluid my-4">
@@ -119,14 +120,15 @@
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-undo" title="Return"></i> 
+                                                <i class="fa fa-undo" title="Return"></i>
                                             </button>
                                         </form>
                                     @endif
 
                                     {{-- PRINT ALL --}}
                                     @if ($pinjam->status == 'disetujui')
-                                        <a href="{{ route('admin.peminjam.cetak', $pinjam->id) }}" target="_blank" class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
+                                        <a href="{{ route('admin.peminjam.cetak', $pinjam->id) }}" target="_blank"
+                                            class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
                                             <i class="fa fa-print"title="Print"></i>
                                         </a>
                                     @endif
@@ -205,7 +207,7 @@
             // Filter Status
             $('#statusFilter').on('change', function() {
                 var status = $(this).val();
-                table.column(7).search(status ? '^' + status + '$' : '', true, false).draw();
+                table.column(6).search(status).draw();
             });
         });
     </script>

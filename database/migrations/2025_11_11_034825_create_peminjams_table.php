@@ -28,6 +28,7 @@ return new class extends Migration {
             // Ganti foreignId jadi string biasa
             $table->string('disetujui_oleh')->nullable();
             $table->timestamp('disetujui_pada')->nullable();
+            $table->timestamp('dikembalikan_pada')->nullable();
 
             $table->String('catatan')->default('-');
 

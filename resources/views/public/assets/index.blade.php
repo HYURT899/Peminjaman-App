@@ -17,7 +17,7 @@
         @else
             <div class="row">
                 @foreach ($assets as $asset)
-                    <div class="col-md-3 mb-4">
+                    <div class="col-6 col-md-3 mb-4">
                         <div class="card h-100 hover hover-5 rounded">
                             @if ($asset->gambar && file_exists(public_path($asset->gambar)))
                                 <a href="{{ route('assets.show', $asset->id) }}">
@@ -37,16 +37,18 @@
                                 @if ($asset->deskripsi)
                                     <p class="card-text text-muted">{{ Str::limit($asset->deskripsi, 80) }}</p>
                                 @endif
-                                <div class="mt-auto">
-                                    <form action="{{ route('keranjang.add') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="asset_id" value="{{ $asset->id }}">
-                                        <button type="submit" class="btn btn-primary btn-sm w-100">
-                                            <i class="fas fa-cart-plus pl-3"></i>
-                                            Tambah ke Peminjaman
-                                        </button>
-                                    </form>
-                                </div>
+                                @if (Auth::id() === 2)
+                                    <div class="mt-auto">
+                                        <form action="{{ route('keranjang.add') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="asset_id" value="{{ $asset->id }}">
+                                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                <i class="fas fa-cart-plus pl-3"></i>
+                                                Tambah ke Peminjaman
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

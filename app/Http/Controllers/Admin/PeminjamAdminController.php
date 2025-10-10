@@ -228,7 +228,10 @@ class PeminjamAdminController extends Controller
     {
         Peminjam::where('nama_peminjam', $nama)
             ->where('status', 'disetujui')
-            ->update(['status' => 'dikembalikan']);
+            ->update([
+                'status' => 'dikembalikan',
+                'dikembalikan_pada' => now()
+            ]);
 
         return redirect()->back()->with('success', "Semua peminjaman oleh {$nama} ditandai sebagai dikembalikan!");
     }

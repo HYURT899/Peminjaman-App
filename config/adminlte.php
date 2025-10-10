@@ -336,7 +336,7 @@ return [
         [
             'text' => 'Kelola User',
             'url' => 'admin/user/users',
-            'icon' => 'fas fa-fw fa-users',
+            'icon' => 'fas fa-user-alt',
         ],
 
         ['header' => 'MISC'],
