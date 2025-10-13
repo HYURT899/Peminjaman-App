@@ -79,14 +79,14 @@
                             <td>
                                 <div class="btn-group" role="group" aria-label="Basic example">
                                     {{-- Aksi utama mengarah ke salah satu record (first) --}}
-                                    <a href="{{ route('admin.peminjam.show', $pinjam->id) }}" class="btn btn-info btn-sm"
+                                    <a href="{{ route('admin.peminjam.show', $pinjam->group_key) }}" class="btn btn-info btn-sm"
                                         title="Detail">
                                         <i class="fa fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.peminjam.edit', $pinjam->id) }}"
+                                    {{-- <a href="{{ route('admin.peminjam.edit', $pinjam->ids) }}"
                                         class="btn btn-warning btn-sm ml-1" title="Edit">
                                         <i class="fa fa-edit"></i>
-                                    </a>
+                                    </a> --}}
 
                                     {{-- APPROVE ALL --}}
                                     @if ($pinjam->status == 'menunggu')
@@ -127,14 +127,14 @@
 
                                     {{-- PRINT ALL --}}
                                     @if ($pinjam->status == 'disetujui')
-                                        <a href="{{ route('admin.peminjam.cetak', $pinjam->id) }}" target="_blank"
+                                        <a href="{{ route('admin.peminjam.cetak', $pinjam->ids) }}" target="_blank"
                                             class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
                                             <i class="fa fa-print"title="Print"></i>
                                         </a>
                                     @endif
 
                                     <!-- TOMBOL DELETE -->
-                                    <form action="{{ route('admin.peminjam.destroy', $pinjam->id) }}" method="POST"
+                                    <form action="{{ route('admin.peminjam.destroy', $pinjam->ids) }}" method="POST"
                                         onsubmit="return confirm('Yakin hapus asset ini?')" style="display:inline-block;">
                                         @csrf
                                         @method('DELETE')

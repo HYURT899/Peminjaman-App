@@ -13,9 +13,6 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Informasi Peminjaman</h3>
                     <div class="card-tools">
-                        <a href="{{ route('admin.peminjam.edit', $peminjaman->id) }}" class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
                         <a href="{{ route('admin.peminjam.index') }}" class="btn btn-secondary btn-sm">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
@@ -28,7 +25,7 @@
                             <table class="table table-bordered">
                                 <tr>
                                     <th width="40%">Kode Peminjaman</th>
-                                    <td>#{{ $peminjaman->id }}</td>
+                                    <td>#{{ implode(',', $peminjaman->ids) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Peminjam</th>
@@ -39,8 +36,8 @@
                                 <tr>
                                     <th>Asset yang Dipinjam</th>
                                     <td>
-                                        @if (isset($allItems) && $allItems->isNotEmpty())
-                                            @foreach ($allItems as $item)
+                                        @if (isset($items) && $items->isNotEmpty())
+                                            @foreach ($items as $item)
                                                 <div class="mb-3 pb-2 border-bottom">
                                                     <div>
                                                         <strong>{{ optional($item->asset)->kode_asset ?? '-' }}</strong>
@@ -69,7 +66,7 @@
                                 {{-- Total jumlah --}}
                                 <tr>
                                     <th>Total Jumlah</th>
-                                    <td>{{ $totalJumlah ?? ($allItems->sum('jumlah') ?? 0) }}</td>
+                                    <td>{{ $peminjaman->total_jumlah }}</td>
                                 </tr>
                             </table>
                         </div>
@@ -115,7 +112,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <strong>Disetujui oleh:</strong>
-                                            {{ optional($peminjaman->disetujuiOleh)->name ?? ($peminjaman->disetujui_oleh ?? 'Admin') }}
+                                            {{ $peminjaman->disetujui_oleh ?? 'Admin' }}
                                         </div>
                                         <div class="col-md-6">
                                             <strong>Tanggal Approval:</strong>
@@ -153,7 +150,7 @@
                                             <h3 class="timeline-header">Peminjaman Disetujui</h3>
                                             <div class="timeline-body">
                                                 Disetujui oleh
-                                                {{ optional($peminjaman->disetujuiOleh)->name ?? ($peminjaman->disetujui_oleh ?? 'Admin') }}
+                                                {{ $peminjaman->disetujui_oleh ?? 'Admin' }}
                                             </div>
                                         </div>
                                     </li>
@@ -168,25 +165,20 @@
                                             <h3 class="timeline-header">Asset Dikembalikan</h3>
                                             <div class="timeline-body">
                                                 Dikembalikan pada
-                                                {{ optional($peminjaman->dikembalikanPada)->name ?? ($peminjaman->dikembalikan_pada ?? now()) }}
+                                                {{ $peminjaman->dikembalikan_pada ?? '-' }}
                                             </div>
                                         </div>
                                     </li>
                                 @endif
 
-                                @if ($peminjaman->dikembalikan_pada)
-                                    {{-- Kosong --}}
-                                @else
-                                    <li>
-                                        <i class="fa fa-clock bg-gray"></i>
-                                    </li>
-                                @endif
+                                @empty($peminjaman->dikembalikan_pada)
+                                    <li><i class="fa fa-clock bg-gray"></i></li>
+                                @endempty
                             </ul>
                         </div>
                     </div>
-
-                </div> {{-- /.card-body --}}
-            </div> {{-- /.card --}}
+                </div>
+            </div>
         </div>
     </div>
 @stop

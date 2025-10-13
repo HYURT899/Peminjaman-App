@@ -67,7 +67,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <small class="text-muted fw-semibold">Total Peminjaman</small>
+                                    <small class="text-muted fw-semibold">Total Asset Yang Dipinjam</small>
                                     <h3 class="mb-0 mt-1">{{ $totalPeminjaman ?? 0 }}</h3>
                                 </div>
                                 <div class="flex-shrink-0">
