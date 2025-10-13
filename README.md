@@ -74,3 +74,50 @@ Pastikan sistem Anda memenuhi requirements berikut:
    ```bash
    git clone https://github.com/username/asset-management.git
    cd asset-management
+
+2. **Install PHP Dependencies**
+   ```bash
+   composer install
+
+3. **Install JavaScript Dependencies**
+   ```bash
+   npm install
+
+4. **Setup Environment File**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+
+5. **Setup Environment File**
+   ```bash
+   a. Buat database MySQL baru dengan nama: asset_management
+   b. Edit file .env dan sesuaikan konfigurasi database:
+     DB_CONNECTION=mysql
+     DB_HOST=127.0.0.1
+     DB_PORT=3306
+     DB_DATABASE=asset_management
+     DB_USERNAME=root
+     DB_PASSWORD=password_anda
+
+6. **Jalankan Database Migration & Seeder**
+   ```bash
+   php artisan migrate --seed
+
+7. **Build Frontend Assets**
+   ```bash
+   npm run build
+
+8. **Buat Storage Link**
+   ```bash
+   php artisan storage:link
+
+9. **Jalankan Development Server**
+   ```bash
+   php artisan serve
+
+10. **Akses Aplikasi**
+   ```bash
+   a. Buka browser dan kunjungi: http://localhost:8000
+   b. Login Default:
+      Admin: admin@example.com / password
+      User: user@example.com / password
