@@ -29,5 +29,7 @@ class Asset extends Model
         return $this->hasMany(KeranjangPeminjaman::class);
     }
 
+    
+
     protected $fillable = ['kode_asset', 'nama_asset', 'gambar', 'qr_code', 'deskripsi', 'category_id'];
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class AssetController extends Controller
@@ -10,27 +11,27 @@ class AssetController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $assets = Asset::paginate(8);
+        // Ambil semua kategori
+        $categories = Category::all();
 
-        return view('public.assets.index', compact('assets'));
-    }
+        // Ambil kategori yang dipilih dari URL (misal ?category=1)
+        $selectedCategory = $request->get('category');
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        
-    }
+        // Query asset beserta relasi kategori
+        $assetsQuery = Asset::with('kategori');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        // Jika kategori dipilih, filter berdasarkan category_id
+        if ($selectedCategory) {
+            $assetsQuery->where('category_id', $selectedCategory);
+        }
+
+        // Pagination (8 per halaman)
+        $assets = $assetsQuery->latest()->paginate(8);
+
+        // Kirim data ke view
+        return view('public.assets.index', compact('assets', 'categories', 'selectedCategory'));
     }
 
     /**
@@ -40,29 +41,5 @@ class AssetController extends Controller
     {
         $asset = Asset::findOrFail($id);
         return view('public.assets.show', compact('asset'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Asset $asset)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Asset $asset)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Asset $asset)
-    {
-        //
     }
 }
