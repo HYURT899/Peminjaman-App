@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Asset;
 use App\Models\Peminjam;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
@@ -24,6 +22,6 @@ class AdminController extends Controller
             ->groupBy('categories.name')
             ->get();
 
-        return view('admin.dashboard', compact('totalAssets', 'kategori', 'totalPeminjams', 'totalUsers'));
+        return view('admin.dashboardAdmin', compact('totalAssets', 'kategori', 'totalPeminjams', 'totalUsers'));
     }
 }

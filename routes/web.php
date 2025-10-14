@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\AssetAdminController;
 use App\Http\Controllers\Admin\PeminjamAdminController;
 use App\Http\Controllers\KeranjangPeminjamanController;
 
-Route::redirect('/','login');
+Route::redirect('/', 'login');
 
 // Route buat ADMIN
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -21,18 +21,20 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Assets
     Route::resource('/admin/assets', AssetAdminController::class)->names('admin.assets');
-    Route::get('/admin/asset/{kode_asset}', [AssetAdminController::class, 'showByQr'])->name('asset.qr.show'); // Buat nampilin qr code
 
     // Kategori
     Route::resource('/admin/category', CategoryController::class)->names('categories');
 
     // Peminjam
     Route::resource('/admin/peminjam', PeminjamAdminController::class)->names('admin.peminjam');
-
-    Route::patch('admin/peminjam/{nama}/approve', [PeminjamAdminController::class, 'approve'])->name('admin.peminjam.approve');
-    Route::patch('admin/peminjam/{nama}/reject', [PeminjamAdminController::class, 'reject'])->name('admin.peminjam.reject');
-    Route::patch('admin/peminjam/{nama}/return', [PeminjamAdminController::class, 'return'])->name('admin.peminjam.return');
-    Route::get('admin/peminjam/{nama}/print', [PeminjamAdminController::class, 'print'])->name('admin.peminjam.cetak');
+    Route::prefix('/admin/peminjam')->name('admin.peminjam.')->group(function () {
+        Route::get('group/{request_id}', [PeminjamAdminController::class, 'showGroup'])->name('showGroup');
+        Route::patch('group/{request_id}/approve', [PeminjamAdminController::class, 'approveGroup'])->name('approveGroup');
+        Route::patch('group/{request_id}/reject', [PeminjamAdminController::class, 'rejectGroup'])->name('rejectGroup');
+        Route::patch('group/{request_id}/return', [PeminjamAdminController::class, 'returnGroup'])->name('returnGroup');
+        Route::get('group/{request_id}/cetak', [PeminjamAdminController::class, 'printGroup'])->name('cetakGroup');
+        Route::delete('group/{request_id}', [PeminjamAdminController::class, 'destroyGroup'])->name('destroyGroup');
+    });
 
     // Users
     Route::resource('/admin/user/users', UserController::class)->names('admin.users');
@@ -41,10 +43,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // Route untuk yang udah login
 Route::middleware('auth',)->group(function () {
     // Dashboard untuk user yang sudah login
-    Route::get(
-        '/dashboard',
-        [HomeController::class, 'index']
-    )->name('dashboard');
+    Route::get('/dashboard',[HomeController::class, 'index'])->name('dashboard');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -54,13 +53,9 @@ Route::middleware('auth',)->group(function () {
     // Halaman daftar asset
     Route::resource('/daftar_asset', AssetController::class)->names('assets');
 
-    // Peminjam melakukan peminjaman
-    Route::post('/peminjam', [PeminjamController::class, 'store'])->name('peminjam.store');
-
     // Keranjang
     // daftar isi keranjang
     Route::get('/keranjang', [KeranjangPeminjamanController::class, 'index'])->name('keranjang.index');
-
     // tambah ke keranjang
     Route::post('/keranjang/add', [KeranjangPeminjamanController::class, 'add'])->name('keranjang.add');
 

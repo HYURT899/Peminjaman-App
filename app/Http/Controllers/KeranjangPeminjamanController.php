@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peminjam;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\KeranjangPeminjaman;
+use Illuminate\Support\Facades\Auth;
 
 class KeranjangPeminjamanController extends Controller
 {
@@ -59,56 +60,29 @@ class KeranjangPeminjamanController extends Controller
      */
     public function submit(Request $request)
     {
-        $validated = $request->validate([
-            'nama_peminjam'   => 'required|string|max:255',
-            'tanggal_pinjam'  => 'required|date',
-            'keperluan'       => 'required|string|max:500',
-            'status'          => 'required|in:menunggu,disetujui,ditolak',
-            'catatan'         => 'nullable|string|max:255',
-        ]);
-
         $items = KeranjangPeminjaman::where('user_id', Auth::id())->get();
+        if ($items->isEmpty()) return back()->with('error', 'Keranjang kosong');
 
-        if ($items->isEmpty()) {
-            return back()->with('error', 'Keranjang masih kosong.');
-        }
+        $requestId = Str::uuid()->toString();
 
-        try {
-            DB::beginTransaction();
-
+        DB::transaction(function () use ($items, $requestId) {
             foreach ($items as $item) {
-                $peminjaman = Peminjam::create([
-                    'user_id'       => Auth::id(),
-                    'nama_peminjam' => $validated['nama_peminjam'],
-                    'asset_id'      => $item->asset_id,
-                    'jumlah'        => $item->jumlah,
-                    'tanggal_pinjam' => $validated['tanggal_pinjam'],
-                    'keperluan'     => $validated['keperluan'],
-                    'status'        => $validated['status'],
-                    'catatan'       => $validated['catatan'] ?? null,
+                Peminjam::create([
+                    'request_id' => $requestId,
+                    'user_id' => Auth::id(),
+                    'nama_peminjam' => Auth::user()->name,
+                    'asset_id' => $item->asset_id,
+                    'jumlah' => $item->jumlah,
+                    'tanggal_pinjam' => now()->toDateString(), // contoh
+                    'keperluan' => request('keperluan') ?? '-',
+                    'status' => 'menunggu'
                 ]);
-
-                // Jika langsung disetujui, isi kolom approval
-                if ($validated['status'] === 'disetujui') {
-                    $peminjaman->update([
-                        'disetujui_oleh' => Auth::user()->name ?? 'Admin',
-                        'disetujui_pada' => now(),
-                    ]);
-                }
             }
-
-            // Kosongkan keranjang
             KeranjangPeminjaman::where('user_id', Auth::id())->delete();
+        });
 
-            DB::commit();
-            return redirect()->view('public.keranjang.keranjang')->with('success', 'Pengajuan peminjaman berhasil dikirim!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors(['error' => 'Gagal submit peminjaman: ' . $e->getMessage()]);
-        }
+        return redirect()->route('keranjang.index')->with('success', 'Pengajuan dikirim');
     }
-
-
 
     public function delete($id)
     {

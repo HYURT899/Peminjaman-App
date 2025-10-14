@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_asset')->unique(); // Kode unik tiap aset
-            $table->string('nama_asset'); // Nama aset
-            $table->string('gambar')->nullable(); // Path/URL gambar
-            $table->text('deskripsi')->nullable(); // Keterangan
+            $table->string('kode_asset')->unique(); 
+            $table->string('nama_asset'); 
+            $table->string('gambar')->nullable();
+            $table->string('qr_code')->nullable();
+            $table->text('deskripsi')->nullable(); 
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

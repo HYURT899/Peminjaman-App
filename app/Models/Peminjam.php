@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Peminjam extends Model
@@ -16,34 +17,21 @@ class Peminjam extends Model
         'catatan',
         'disetujui_oleh',
         'disetujui_pada',
+        'request_id'
     ];
     public function asset()
     {
         return $this->belongsTo(Asset::class);
     }
 
-    public static function generateKodePeminjam()
+    // Function untuk mengisi kolom request_id di tabel peminjam
+    protected static function boot()
     {
-        $date = now()->format('Ymd');
-        $prefix = "PMJ-{$date}-";
-
-        // Cari kode terakhir untuk hari ini
-        $lastPeminjam = self::where('kode_peminjam', 'like', $prefix . '%')
-            ->orderBy('kode_peminjam', 'desc')
-            ->first();
-
-        if ($lastPeminjam) {
-            // Extract angka terakhir dan increment
-            $lastNumber = (int) substr($lastPeminjam->kode_peminjam, -4);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            // Jika belum ada untuk hari ini, mulai dari 0001
-            $nextNumber = 1;
-        }
-
-        // Format angka dengan leading zeros
-        $formattedNumber = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-
-        return $prefix . $formattedNumber;
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->request_id)) {
+                $model->request_id = (string) Str::uuid();
+            }
+        });
     }
 }

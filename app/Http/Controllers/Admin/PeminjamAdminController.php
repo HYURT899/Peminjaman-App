@@ -15,78 +15,37 @@ class PeminjamAdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // Di Controller - index method
     public function index()
     {
-        // Ambil semua data peminjaman beserta relasi asset-nya
         $peminjam = Peminjam::with('asset')
+            ->orderBy('created_at', 'desc')
             ->get()
-
-            // Grouping data berdasarkan kombinasi unik:
-            // nama peminjam + tanggal pinjam + keperluan
-            // Tujuannya agar setiap peminjaman yang benar-benar berbeda (meski nama sama)
-            // tetap dianggap sebagai kelompok terpisah.
-            ->groupBy(function ($item) {
-                // Bersihkan nama agar konsisten (hapus spasi & lowercase)
-                $nama = trim(strtolower($item->nama_peminjam ?? ''));
-
-                // Format tanggal pinjam ke bentuk YYYY-MM-DD agar konsisten
-                $tgl = $item->tanggal_pinjam
-                    ? \Carbon\Carbon::parse($item->tanggal_pinjam)->format('Y-m-d')
-                    : 'no-date';
-
-                // Keperluan juga dibersihkan agar tidak beda hanya karena kapitalisasi/spasi
-                $keperluan = trim(strtolower($item->keperluan ?? 'no-keperluan'));
-
-                // Gabungkan jadi satu string unik sebagai kunci grup
-                // Contoh: "asep|2025-10-09|perbaikan laptop"
-                return $nama . '|' . $tgl . '|' . $keperluan;
-            })
-
-            // Setelah digroup, lakukan transformasi pada setiap grup
+            // group by request_id — gunakan request_id sebagai kunci unik grup
+            ->groupBy('request_id')
             ->map(function ($group) {
+                $ids = $group->pluck('id')->sort()->values()->toArray();
 
-                // Buat daftar asset yang dipinjam dalam grup ini
-                $assetsLines = $group->map(function ($item) {
-                    $assetName = optional($item->asset)->nama_asset ?? '-';
-                    $assetCode = optional($item->asset)->kode_asset ?? '-';
-                    return $assetName . ' - ' . $assetCode . ' (' . $item->jumlah . ')';
-                })->toArray();
+                // tentukan status ringkasan (prioritas)
+                $statuses = $group->pluck('status')->unique()->toArray();
+                if (in_array('menunggu', $statuses)) $groupStatus = 'menunggu';
+                elseif (in_array('disetujui', $statuses) && !in_array('menunggu', $statuses)) $groupStatus = 'disetujui';
+                elseif (in_array('ditolak', $statuses)) $groupStatus = 'ditolak';
+                else $groupStatus = $statuses[0] ?? 'menunggu';
 
-                // Return satu objek "ringkasan" dari grup peminjaman
-                return (object) [
-
-                    // Hash unik (md5 dari semua id peminjaman di grup ini)
-                    // berguna kalau nanti butuh ID group khusus.
-                    'group_key' => md5($group->pluck('id')->implode(',')),
-
-                    // Nama peminjam (ambil dari record pertama dalam grup)
+                return (object)[
+                    // gunakan request_id langsung (bukan md5/arr) supaya mudah dipakai di route
+                    'request_id'   => $group->first()->request_id,
                     'nama_peminjam' => $group->first()->nama_peminjam,
-
-                    // Gabungkan semua asset ke bentuk HTML (pakai <br> untuk tampilan tabel)
-                    'assets' => implode('<br>', $assetsLines),
-
-                    // Hitung total jumlah barang dalam grup ini
+                    'assets'       => $group->map(fn($i) => optional($i->asset)->nama_asset . ' (' . $i->jumlah . ')')->implode('<br>'),
                     'total_jumlah' => $group->sum('jumlah'),
-
-                    // Ambil tanggal pinjam dari record pertama (karena semua sama dalam grup)
                     'tanggal_pinjam' => $group->first()->tanggal_pinjam,
-
-                    // Gabungkan semua keperluan unik dalam grup (kalau lebih dari satu)
-                    'keperluan' => $group->pluck('keperluan')->unique()->implode(', '),
-
-                    // Status ambil dari record pertama (umumnya sama untuk satu grup)
-                    'status' => $group->first()->status,
-
-                    // Simpan semua ID peminjaman dalam grup ini (penting untuk aksi massal)
-                    'ids' => $group->pluck('id')->toArray(),
+                    'keperluan'    => $group->first()->keperluan,
+                    'status'       => $groupStatus,
+                    'ids'          => $ids,
                 ];
-            })
+            })->values();
 
-            // Ubah hasilnya jadi urutan array tanpa key (numerik)
-            ->values();
-
-        return view('admin.peminjam.index', compact('peminjam'));
+        return view('admin.peminjam.peminjam', compact('peminjam'));
     }
 
 
@@ -98,7 +57,7 @@ class PeminjamAdminController extends Controller
         $users = User::all();
         $assets = Asset::all();
 
-        return view('admin.peminjam.create', compact('users', 'assets'));
+        return view('admin.peminjam.createPeminjam', compact('users', 'assets'));
     }
 
     /**
@@ -132,7 +91,7 @@ class PeminjamAdminController extends Controller
             // Jika status langsung "disetujui", set approval info
             if ($request->status == 'disetujui') {
                 $peminjaman->update([
-                    'disetujui_oleh' => auth()->name ?? 'Admin', // Simpan nama admin
+                    'disetujui_oleh' => auth()->name ?? 'Admin',
                     'disetujui_pada' => now(),
                 ]);
             }
@@ -152,141 +111,111 @@ class PeminjamAdminController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $group_key)
+    public function showGroup(string $request_id)
     {
-        // ambil semua peminjaman dengan relasi asset (atau batasi jika datanya besar)
-        $all = Peminjam::with('asset')->get();
-
-        // rebuild grouping dengan logika yang sama seperti index()
-        $groups = $all->groupBy(function ($item) {
-            $nama = trim(strtolower($item->nama_peminjam ?? ''));
-            $tgl  = $item->tanggal_pinjam
-                ? \Carbon\Carbon::parse($item->tanggal_pinjam)->format('Y-m-d')
-                : 'no-date';
-            $keperluan = trim(strtolower($item->keperluan ?? 'no-keperluan'));
-            return $nama . '|' . $tgl . '|' . $keperluan;
-        })->map(function ($group) {
-            $assetsLines = $group->map(function ($item) {
-                $assetName = optional($item->asset)->nama_asset ?? '-';
-                $assetCode = optional($item->asset)->kode_asset ?? '-';
-                return $assetName . ' - ' . $assetCode . ' (' . $item->jumlah . ')';
-            })->toArray();
-
-            // ids diurutkan supaya group_key konsisten
-            $ids = $group->pluck('id')->sort()->values()->toArray();
-
-            return (object) [
-                'group_key'      => md5(implode(',', $ids)),
-                'nama_peminjam'  => $group->first()->nama_peminjam,
-                'assets'         => implode('<br>', $assetsLines),
-                'total_jumlah'   => $group->sum('jumlah'),
-                'tanggal_pinjam' => $group->first()->tanggal_pinjam,
-                'keperluan'      => $group->pluck('keperluan')->unique()->implode(', '),
-                'status'         => $group->first()->status,
-                'catatan'        => $group->first()->catatan,
-                'disetujui_oleh' => $group->first()->disetujui_oleh,
-                'disetujui_pada' => $group->first()->disetujui_pada,
-                'dikembalikan_pada' => $group->first()->dikembalikan_pada,
-                'created_at'     => $group->first()->created_at,
-                'ids'            => $ids,
-            ];
-        })->values();
-
-        // cari grup yang sesuai group_key
-        $peminjaman = $groups->firstWhere('group_key', $group_key);
-
-        if (! $peminjaman) {
-            // grup tidak ditemukan -> 404
-            abort(404, 'Grup peminjaman tidak ditemukan.');
-        }
-
-        // ambil semua row Peminjam asli yang termasuk di grup ini
-        $items = Peminjam::with('asset')->whereIn('id', $peminjaman->ids)
-            ->orderBy('id') // urutkan sesuai kebutuhan
+        $items = Peminjam::with('asset')
+            ->where('request_id', $request_id)
+            ->orderBy('id')
             ->get();
 
-        return view('admin.peminjam.show', compact('peminjaman', 'items'));
+        if ($items->isEmpty()) abort(404, 'Grup peminjaman tidak ditemukan.');
+
+        // summary ringkasan (ambil meta dari first)
+        $peminjaman = (object)[
+            'request_id' => $request_id,
+            'nama_peminjam' => $items->first()->nama_peminjam,
+            'tanggal_pinjam' => $items->first()->tanggal_pinjam,
+            'keperluan' => $items->pluck('keperluan')->unique()->implode(', '),
+            'total_jumlah' => $items->first()->total_pinjam,
+            'catatan' => $items->first()->catatan,
+            'disetujui_pada' => $items->first()->disetujui_pada,
+            'disetujui_oleh' => $items->first()->disetujui_oleh,
+            'dikembalikan_pada' => $items->first()->dikembalikan_pada,
+            'status' => $items->pluck('status')->contains('menunggu') ? 'menunggu' : ($items->pluck('status')->contains('disetujui') ? 'disetujui' : $items->first()->status),
+            'ids' => $items->pluck('id')->toArray(),
+            'created_at' => $items->first()->created_at,
+        ];
+
+        return view('admin.peminjam.showPeminjam', compact('peminjaman', 'items'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        $peminjaman = Peminjam::findOrFail($id);
-        $users = User::all();
-        $assets = Asset::all();
+    // public function edit(string $id)
+    // {
+    //     $peminjaman = Peminjam::findOrFail($id);
+    //     $users = User::all();
+    //     $assets = Asset::all();
 
-        return view('admin.peminjam.edit', compact('peminjaman', 'users', 'assets'));
-    }
+    //     return view('admin.peminjam.editPeminjam', compact('peminjaman', 'users', 'assets'));
+    // }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        $peminjaman = Peminjam::findOrFail($id);
+    // public function update(Request $request, string $id)
+    // {
+    //     $peminjaman = Peminjam::findOrFail($id);
 
-        // Validasi dasar
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'nama_peminjam' => 'required|string|max:255',
-            'asset_id' => 'required|exists:assets,id',
-            'jumlah' => 'required|integer|min:1',
-            'tanggal_pinjam' => 'required|date',
-            'keperluan' => 'required|string|max:500',
-            'status' => 'required|in:menunggu,disetujui,ditolak,dikembalikan',
-            'catatan' => 'nullable|string|max:255',
-        ]);
+    //     // Validasi dasar
+    //     $validated = $request->validate([
+    //         'user_id' => 'required|exists:users,id',
+    //         'nama_peminjam' => 'required|string|max:255',
+    //         'asset_id' => 'required|exists:assets,id',
+    //         'jumlah' => 'required|integer|min:1',
+    //         'tanggal_pinjam' => 'required|date',
+    //         'keperluan' => 'required|string|max:500',
+    //         'status' => 'required|in:menunggu,disetujui,ditolak,dikembalikan',
+    //         'catatan' => 'nullable|string|max:255',
+    //     ]);
 
-        try {
-            DB::beginTransaction();
+    //     try {
+    //         DB::beginTransaction();
 
-            // Update data peminjaman
-            $peminjaman->update([
-                'nama_peminjam' => $request->nama_peminjam,
-                'asset_id' => $request->asset_id,
-                'jumlah' => $request->jumlah,
-                'tanggal_pinjam' => $request->tanggal_pinjam,
-                'keperluan' => $request->keperluan,
-                'status' => $request->status,
-                'catatan' => $request->catatan,
-            ]);
+    //         // Update data peminjaman
+    //         $peminjaman->update([
+    //             'nama_peminjam' => $request->nama_peminjam,
+    //             'asset_id' => $request->asset_id,
+    //             'jumlah' => $request->jumlah,
+    //             'tanggal_pinjam' => $request->tanggal_pinjam,
+    //             'keperluan' => $request->keperluan,
+    //             'status' => $request->status,
+    //             'catatan' => $request->catatan,
+    //         ]);
 
-            // Jika status diubah menjadi "disetujui" dari status lain
-            if ($request->status == 'disetujui' && $peminjaman->getOriginal('status') != 'disetujui') {
-                $peminjaman->update([
-                    'disetujui_oleh' => auth()->name ?? 'Admin',
-                    'disetujui_pada' => now(),
-                ]);
-            }
+    //         // Jika status diubah menjadi "disetujui" dari status lain
+    //         if ($request->status == 'disetujui' && $peminjaman->getOriginal('status') != 'disetujui') {
+    //             $peminjaman->update([
+    //                 'disetujui_oleh' => auth()->name ?? 'Admin',
+    //                 'disetujui_pada' => now(),
+    //             ]);
+    //         }
 
-            DB::commit();
+    //         DB::commit();
 
-            return redirect()->route('admin.peminjam.index')->with('success', 'Peminjaman berhasil diperbarui!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors(['error' => 'Gagal memperbarui peminjaman: ' . $e->getMessage()]);
-        }
-    }
+    //         return redirect()->route('admin.peminjam.index')->with('success', 'Peminjaman berhasil diperbarui!');
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return redirect()
+    //             ->back()
+    //             ->withInput()
+    //             ->withErrors(['error' => 'Gagal memperbarui peminjaman: ' . $e->getMessage()]);
+    //     }
+    // }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroyGroup(string $request_id)
     {
-        $asset = Peminjam::findOrFail($id);
-        $asset->delete();
-
-        return redirect()->route('admin.peminjam.index')->with('success', 'Peminjam berhasil dihapus!');
+        Peminjam::where('request_id', $request_id)->delete();
+        return redirect()->route('admin.peminjam.index')->with('success', 'Grup peminjaman berhasil dihapus.');
     }
 
-    public function approve($nama)
+    public function approveGroup(string $request_id)
     {
-        Peminjam::where('nama_peminjam', $nama)
+        Peminjam::where('request_id', $request_id)
             ->where('status', 'menunggu')
             ->update([
                 'status' => 'disetujui',
@@ -294,48 +223,46 @@ class PeminjamAdminController extends Controller
                 'disetujui_pada' => now()
             ]);
 
-        return redirect()->back()->with('success', "Semua peminjaman oleh {$nama} disetujui!");
+        return redirect()->back()->with('success', 'Semua item pada grup berhasil disetujui.');
     }
 
-    public function reject($nama)
+    public function rejectGroup(string $request_id)
     {
-        Peminjam::where('nama_peminjam', $nama)
+        Peminjam::where('request_id', $request_id)
             ->where('status', 'menunggu')
             ->update(['status' => 'ditolak']);
 
-        return redirect()->back()->with('success', "Semua peminjaman oleh {$nama} ditolak!");
+        return redirect()->back()->with('success', 'Semua item pada grup berhasil ditolak.');
     }
 
-    public function return($nama)
+    public function returnGroup(string $request_id)
     {
-        Peminjam::where('nama_peminjam', $nama)
+        Peminjam::where('request_id', $request_id)
             ->where('status', 'disetujui')
             ->update([
                 'status' => 'dikembalikan',
                 'dikembalikan_pada' => now()
             ]);
 
-        return redirect()->back()->with('success', "Semua peminjaman oleh {$nama} ditandai sebagai dikembalikan!");
+        return redirect()->back()->with('success', 'Semua item pada grup ditandai dikembalikan.');
     }
 
-    public function print(string $id)
+    public function printGroup(string $request_id)
     {
-        // ambil 1 record (dipakai untuk meta seperti nama peminjam, tanggal dsb)
-        $peminjaman = Peminjam::with('asset')->findOrFail($id);
+        $items = Peminjam::with('asset')->where('request_id', $request_id)->get();
+        if ($items->isEmpty()) abort(404);
 
-        // ambil semua peminjaman yang punya nama_peminjam sama
-        $allPeminjaman = Peminjam::with('asset')
-            ->where('nama_peminjam', $peminjaman->nama_peminjam)
-            ->get();
-
-        // buat string seperti: "1 CCTV, 2 Tangga, 3 Laptop"
-        $assetsText = $allPeminjaman->map(function ($item) {
+        // Buat string: "1 CCTV, 2 Tangga, ..."
+        $assetsText = $items->map(function ($item) {
             $assetName = optional($item->asset)->nama_asset ?? '-';
-            // pastikan ada spasi setelah jumlah: "2 Tangga"
             return $item->jumlah . ' ' . $assetName;
         })->implode(', ');
 
-        // kirim semuanya ke view
-        return view('admin.peminjam.print', compact('peminjaman', 'allPeminjaman', 'assetsText'));
+        $summary = (object)[
+            'nama_peminjam' => $items->first()->nama_peminjam,
+            'tanggal_pinjam' => $items->first()->tanggal_pinjam,
+        ];
+
+        return view('admin.peminjam.printPeminjam', compact('items', 'assetsText', 'summary'));
     }
 }

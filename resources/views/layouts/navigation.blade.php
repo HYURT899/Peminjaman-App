@@ -3,7 +3,7 @@
         {{-- Logo --}}
         <a class="navbar-brand text-dark" href="{{ route('dashboard') }}">
             {{-- Ganti dengan logo atau nama aplikasi --}}
-            <img src="{{ asset('images/logo_asset_nama.png') }}" alt="logo" width="150">
+            <img src="{{ asset('images/logo asset management-10.png') }}" alt="logo" width="150">
             {{-- {{ config('app.name', 'Laravel') }} --}}
         </a>
 

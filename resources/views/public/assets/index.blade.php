@@ -69,22 +69,18 @@
                                     <p class="card-text text-muted small">{{ Str::limit($asset->deskripsi, 80) }}</p>
                                 @endif
 
-                                {{-- Tombol --}}
-                                @auth
-                                    @if (Auth::id() === 2)
-                                        <div class="mt-auto">
-                                            <form action="{{ route('keranjang.add') }}" method="POST">
-                                                @csrf
-                                                <input type="hidden" name="asset_id" value="{{ $asset->id }}">
-                                                @if (auth()->user() && auth()->user()->hasRole('User'))
-                                                    <button class="btn btn-primary w-100 rounded-3 shadow-sm">
-                                                        <i class="bi bi-cart-plus"></i> Tambah
-                                                    </button>
-                                                @endif
-                                            </form>
-                                        </div>
-                                    @endif
-                                @endauth
+                                @if (Auth::id() === 2)
+                                    <div class="mt-auto">
+                                        <form action="{{ route('keranjang.add') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="asset_id" value="{{ $asset->id }}">
+                                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                <i class="fas fa-cart-plus pl-3"></i>
+                                                Tambah ke Peminjaman
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

@@ -33,7 +33,7 @@ class AssetAdminController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.assets.create', compact('categories'));
+        return view('admin.assets.createAsset', compact('categories'));
     }
 
     /**
@@ -79,7 +79,7 @@ class AssetAdminController extends Controller
 
             $writer = new PngWriter();
 
-            // Buat objek QrCode (cara modern, pake named args — butuh PHP 8+)
+            // Buat objek QrCode
             $qrCode = new QrCode(data: $url, encoding: new Encoding('UTF-8'), 
                 errorCorrectionLevel: ErrorCorrectionLevel::High, size: 300, margin: 10, 
                 roundBlockSizeMode: RoundBlockSizeMode::Margin, 
@@ -111,7 +111,7 @@ class AssetAdminController extends Controller
     public function show(string $id)
     {
         $asset = Asset::findOrFail($id);
-        return view('admin.assets.show', compact('asset'));
+        return view('admin.assets.showAsset', compact('asset'));
     }
 
     /**
@@ -133,7 +133,7 @@ class AssetAdminController extends Controller
         $request->validate([
             'kode_asset' => 'required|unique:assets,kode_asset,' . $asset->id,
             'nama_asset' => 'required',
-            'category_id' => 'required|exists:categories,id', // VALIDASI CATEGORY
+            'category_id' => 'required|exists:categories,id',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'deskripsi' => 'nullable|string',
         ]);
@@ -173,21 +173,5 @@ class AssetAdminController extends Controller
 
         $asset->delete();
         return redirect()->route('admin.assets.index')->with('success', 'Asset berhasil dihapus!');
-    }
-
-    public function showByQr($kode_asset)
-    {
-        // Cari asset berdasarkan 'kode_asset' yang di-scan dari QR Code
-        $asset = Asset::with('category') // Eager load category jika ada relasi
-            ->where('kode_asset', $kode_asset)
-            ->first();
-
-        // Jika asset tidak ditemukan, tampilkan error 404
-        if (!$asset) {
-            abort(404, 'Asset dengan kode ' . $kode_asset . ' tidak ditemukan.');
-        }
-
-        // Tampilkan view khusus untuk hasil scan (mobile-friendly)
-        return view('assets.show_qr', compact('asset'));
     }
 }

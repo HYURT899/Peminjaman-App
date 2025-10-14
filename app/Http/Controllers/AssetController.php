@@ -13,9 +13,7 @@ class AssetController extends Controller
      */
     public function index(Request $request)
     {
-        // Ambil semua kategori
         $categories = Category::all();
-
         // Ambil kategori yang dipilih dari URL (misal ?category=1)
         $selectedCategory = $request->get('category');
 

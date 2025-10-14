@@ -25,13 +25,14 @@ return new class extends Migration {
 
             $table->enum('status', ['menunggu', 'disetujui', 'ditolak', 'dikembalikan'])->default('menunggu');
 
-            // Ganti foreignId jadi string biasa
+            // Approval
             $table->string('disetujui_oleh')->nullable();
             $table->timestamp('disetujui_pada')->nullable();
             $table->timestamp('dikembalikan_pada')->nullable();
 
-            $table->String('catatan')->default('-');
-
+            // Catatan dan request_id
+            $table->string('catatan')->default('-');
+            $table->string('request_id', 36)->nullable()->index();
 
             $table->timestamps();
         });
@@ -42,6 +43,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('peminjaman');
+        Schema::dropIfExists('peminjams');
     }
 };

@@ -79,8 +79,8 @@
                             <td>
                                 <div class="btn-group" role="group" aria-label="Basic example">
                                     {{-- Aksi utama mengarah ke salah satu record (first) --}}
-                                    <a href="{{ route('admin.peminjam.show', $pinjam->group_key) }}" class="btn btn-info btn-sm"
-                                        title="Detail">
+                                    <a href="{{ route('admin.peminjam.showGroup',  $pinjam->request_id) }}"
+                                        class="btn btn-info btn-sm" title="Detail">
                                         <i class="fa fa-eye"></i>
                                     </a>
                                     {{-- <a href="{{ route('admin.peminjam.edit', $pinjam->ids) }}"
@@ -90,57 +90,53 @@
 
                                     {{-- APPROVE ALL --}}
                                     @if ($pinjam->status == 'menunggu')
-                                        <form action="{{ route('admin.peminjam.approve', $pinjam->nama_peminjam) }}"
-                                            method="POST" style="display:inline-block;"
-                                            onsubmit="return confirm('Yakin ingin menyetujui semua peminjaman dari {{ $pinjam->nama_peminjam }}?')">
+                                        <form action="{{ route('admin.peminjam.approveGroup', $pinjam->request_id) }}"
+                                            method="POST" style="display:inline-block;">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-success btn-sm ml-1">
-                                                <i class="fa fa-check"></i>
-                                            </button>
+                                            <button type="submit" class="btn btn-success btn-sm ml-1"><i
+                                                    class="fa fa-check"></i></button>
                                         </form>
                                     @endif
 
                                     {{-- REJECT ALL --}}
                                     @if ($pinjam->status == 'menunggu')
-                                        <form action="{{ route('admin.peminjam.reject', $pinjam->nama_peminjam) }}"
+                                        <form action="{{ route('admin.peminjam.rejectGroup', $pinjam->request_id) }}"
                                             method="POST" style="display:inline-block;">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-times"></i>
-                                            </button>
+                                            <button type="submit" class="btn btn-danger btn-sm"><i
+                                                    class="fa fa-times"></i></button>
                                         </form>
                                     @endif
 
                                     {{-- RETURN ALL --}}
                                     @if ($pinjam->status == 'disetujui')
-                                        <form action="{{ route('admin.peminjam.return', $pinjam->nama_peminjam) }}"
+                                        <form action="{{ route('admin.peminjam.returnGroup', $pinjam->request_id) }}"
                                             method="POST" style="display:inline-block;">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-undo" title="Return"></i>
-                                            </button>
+                                            <button type="submit" class="btn btn-primary btn-sm"><i
+                                                    class="fa fa-undo"></i></button>
                                         </form>
                                     @endif
 
                                     {{-- PRINT ALL --}}
                                     @if ($pinjam->status == 'disetujui')
-                                        <a href="{{ route('admin.peminjam.cetak', $pinjam->ids) }}" target="_blank"
-                                            class="btn btn-sm btn-primary ml-1 rounded" style="display:inline-block;">
-                                            <i class="fa fa-print"title="Print"></i>
+                                        <a href="{{ route('admin.peminjam.cetakGroup', $pinjam->request_id) }}"
+                                            target="_blank" class="btn btn-sm btn-primary ml-1 rounded">
+                                            <i class="fa fa-print"></i>
                                         </a>
                                     @endif
 
                                     <!-- TOMBOL DELETE -->
-                                    <form action="{{ route('admin.peminjam.destroy', $pinjam->ids) }}" method="POST"
-                                        onsubmit="return confirm('Yakin hapus asset ini?')" style="display:inline-block;">
+                                    <form action="{{ route('admin.peminjam.destroyGroup', $pinjam->request_id) }}"
+                                        method="POST" style="display:inline-block;"
+                                        onsubmit="return confirm('Yakin hapus grup ini?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger btn-sm ml-1" title="Hapus">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
+                                        <button type="submit" class="btn btn-outline-danger btn-sm ml-1"><i
+                                                class="fa fa-trash"></i></button>
                                     </form>
                                 </div>
                             </td>
