@@ -37,11 +37,10 @@
                 @foreach ($assets as $asset)
                     <div class="col-6 col-md-3 mb-4">
                         <div class="card h-100 hover hover-5 rounded">
-                            {{-- Gambar asset --}}
-                            @if ($asset->gambar && file_exists(storage_path('app/public/' . $asset->gambar)))
+                            @if ($asset->gambar)
                                 <a href="{{ route('assets.show', $asset->id) }}">
-                                    <img src="{{ asset('storage/' . $asset->gambar) }}" class="card-img-top"
-                                        alt="{{ $asset->nama_asset }}">
+                                    <img src="{{ asset('storage/' . $asset->gambar) }}" alt="Gambar Asset"
+                                        class="card-img-top" data-full="{{ asset('storage/' . $asset->gambar) }}">
                                 </a>
                             @else
                                 <div class="d-flex align-items-center justify-content-center bg-light"

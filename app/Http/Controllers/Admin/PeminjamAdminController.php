@@ -18,30 +18,72 @@ class PeminjamAdminController extends Controller
     // Di Controller - index method
     public function index()
     {
-        // ambil semua peminjaman beserta relasi asset
+        // Ambil semua data peminjaman beserta relasi asset-nya
         $peminjam = Peminjam::with('asset')
             ->get()
-            ->groupBy('nama_peminjam') // grup per nama peminjam
+
+            // Grouping data berdasarkan kombinasi unik:
+            // nama peminjam + tanggal pinjam + keperluan
+            // Tujuannya agar setiap peminjaman yang benar-benar berbeda (meski nama sama)
+            // tetap dianggap sebagai kelompok terpisah.
+            ->groupBy(function ($item) {
+                // Bersihkan nama agar konsisten (hapus spasi & lowercase)
+                $nama = trim(strtolower($item->nama_peminjam ?? ''));
+
+                // Format tanggal pinjam ke bentuk YYYY-MM-DD agar konsisten
+                $tgl = $item->tanggal_pinjam
+                    ? \Carbon\Carbon::parse($item->tanggal_pinjam)->format('Y-m-d')
+                    : 'no-date';
+
+                // Keperluan juga dibersihkan agar tidak beda hanya karena kapitalisasi/spasi
+                $keperluan = trim(strtolower($item->keperluan ?? 'no-keperluan'));
+
+                // Gabungkan jadi satu string unik sebagai kunci grup
+                // Contoh: "asep|2025-10-09|perbaikan laptop"
+                return $nama . '|' . $tgl . '|' . $keperluan;
+            })
+
+            // Setelah digroup, lakukan transformasi pada setiap grup
             ->map(function ($group) {
-                // buat array string per asset: "NamaAsset - KODE (jumlah)"
+
+                // Buat daftar asset yang dipinjam dalam grup ini
                 $assetsLines = $group->map(function ($item) {
                     $assetName = optional($item->asset)->nama_asset ?? '-';
                     $assetCode = optional($item->asset)->kode_asset ?? '-';
-                    return $assetName . ' - ' . $assetCode . ' <strong>(' . $item->jumlah . ')</strong>';
+                    return $assetName . ' - ' . $assetCode . ' (' . $item->jumlah . ')';
                 })->toArray();
 
+                // Return satu objek "ringkasan" dari grup peminjaman
                 return (object) [
-                    'nama_peminjam'  => $group->first()->nama_peminjam,
-                    'assets'         => implode('<br>', $assetsLines), // nanti diberi {!! !!} di blade
-                    'total_jumlah'   => $group->sum('jumlah'), // total semua jumlah
-                    'tanggal_pinjam' => $group->first()->tanggal_pinjam, // ambil salah satu (bisa diubah jadi min/max)
-                    'keperluan'      => $group->pluck('keperluan')->unique()->implode(', '),
-                    'status'         => $group->first()->status, // aturan: ambil yang pertama (ubah sesuai kebutuhan)
-                    'id'             => $group->first()->id, // id dari salah satu record (dipakai untuk tombol CRUD)
-                    'ids'            => $group->pluck('id')->toArray(), // kalau mau list detail tiap item
+
+                    // Hash unik (md5 dari semua id peminjaman di grup ini)
+                    // berguna kalau nanti butuh ID group khusus.
+                    'group_key' => md5($group->pluck('id')->implode(',')),
+
+                    // Nama peminjam (ambil dari record pertama dalam grup)
+                    'nama_peminjam' => $group->first()->nama_peminjam,
+
+                    // Gabungkan semua asset ke bentuk HTML (pakai <br> untuk tampilan tabel)
+                    'assets' => implode('<br>', $assetsLines),
+
+                    // Hitung total jumlah barang dalam grup ini
+                    'total_jumlah' => $group->sum('jumlah'),
+
+                    // Ambil tanggal pinjam dari record pertama (karena semua sama dalam grup)
+                    'tanggal_pinjam' => $group->first()->tanggal_pinjam,
+
+                    // Gabungkan semua keperluan unik dalam grup (kalau lebih dari satu)
+                    'keperluan' => $group->pluck('keperluan')->unique()->implode(', '),
+
+                    // Status ambil dari record pertama (umumnya sama untuk satu grup)
+                    'status' => $group->first()->status,
+
+                    // Simpan semua ID peminjaman dalam grup ini (penting untuk aksi massal)
+                    'ids' => $group->pluck('id')->toArray(),
                 ];
             })
-            // jika mau dijadikan koleksi biasa (opsional)
+
+            // Ubah hasilnya jadi urutan array tanpa key (numerik)
             ->values();
 
         return view('admin.peminjam.index', compact('peminjam'));
@@ -110,20 +152,60 @@ class PeminjamAdminController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $group_key)
     {
-        // Ambil satu record (dipakai untuk header/detail umum)
-        $peminjaman = Peminjam::with('asset')->findOrFail($id);
+        // ambil semua peminjaman dengan relasi asset (atau batasi jika datanya besar)
+        $all = Peminjam::with('asset')->get();
 
-        // Ambil semua peminjaman yang punya nama_peminjam sama (semua item milik user tersebut)
-        $allItems = Peminjam::with('asset')
-            ->where('nama_peminjam', $peminjaman->nama_peminjam)
+        // rebuild grouping dengan logika yang sama seperti index()
+        $groups = $all->groupBy(function ($item) {
+            $nama = trim(strtolower($item->nama_peminjam ?? ''));
+            $tgl  = $item->tanggal_pinjam
+                ? \Carbon\Carbon::parse($item->tanggal_pinjam)->format('Y-m-d')
+                : 'no-date';
+            $keperluan = trim(strtolower($item->keperluan ?? 'no-keperluan'));
+            return $nama . '|' . $tgl . '|' . $keperluan;
+        })->map(function ($group) {
+            $assetsLines = $group->map(function ($item) {
+                $assetName = optional($item->asset)->nama_asset ?? '-';
+                $assetCode = optional($item->asset)->kode_asset ?? '-';
+                return $assetName . ' - ' . $assetCode . ' (' . $item->jumlah . ')';
+            })->toArray();
+
+            // ids diurutkan supaya group_key konsisten
+            $ids = $group->pluck('id')->sort()->values()->toArray();
+
+            return (object) [
+                'group_key'      => md5(implode(',', $ids)),
+                'nama_peminjam'  => $group->first()->nama_peminjam,
+                'assets'         => implode('<br>', $assetsLines),
+                'total_jumlah'   => $group->sum('jumlah'),
+                'tanggal_pinjam' => $group->first()->tanggal_pinjam,
+                'keperluan'      => $group->pluck('keperluan')->unique()->implode(', '),
+                'status'         => $group->first()->status,
+                'catatan'        => $group->first()->catatan,
+                'disetujui_oleh' => $group->first()->disetujui_oleh,
+                'disetujui_pada' => $group->first()->disetujui_pada,
+                'dikembalikan_pada' => $group->first()->dikembalikan_pada,
+                'created_at'     => $group->first()->created_at,
+                'ids'            => $ids,
+            ];
+        })->values();
+
+        // cari grup yang sesuai group_key
+        $peminjaman = $groups->firstWhere('group_key', $group_key);
+
+        if (! $peminjaman) {
+            // grup tidak ditemukan -> 404
+            abort(404, 'Grup peminjaman tidak ditemukan.');
+        }
+
+        // ambil semua row Peminjam asli yang termasuk di grup ini
+        $items = Peminjam::with('asset')->whereIn('id', $peminjaman->ids)
+            ->orderBy('id') // urutkan sesuai kebutuhan
             ->get();
 
-        // Total jumlah semua item (opsional, kalau mau ditampilkan)
-        $totalJumlah = $allItems->sum('jumlah');
-
-        return view('admin.peminjam.show', compact('peminjaman', 'allItems', 'totalJumlah'));
+        return view('admin.peminjam.show', compact('peminjaman', 'items'));
     }
 
     /**

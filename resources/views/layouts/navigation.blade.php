@@ -3,8 +3,8 @@
         {{-- Logo --}}
         <a class="navbar-brand text-dark" href="{{ route('dashboard') }}">
             {{-- Ganti dengan logo atau nama aplikasi --}}
-            <img src="{{ asset('images/logo fps-01.png') }}" alt="logo" width="35">
-            {{ config('app.name', 'Laravel') }}
+            <img src="{{ asset('images/logo_asset_nama.png') }}" alt="logo" width="150">
+            {{-- {{ config('app.name', 'Laravel') }} --}}
         </a>
 
         {{-- Toggle button untuk mobile --}}
@@ -17,7 +17,7 @@
         <div class="collapse navbar-collapse mx-4" id="navbarSupportedContent">
             {{-- Left Side (Menu) --}}
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <x-nav-link :active="request()->routeIs('public.dashboard')" href="{{ route('dashboard') }}">
+                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}">
                     Dashboard
                 </x-nav-link>
 
@@ -47,9 +47,9 @@
                             {{ Auth::user()->name }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li>
+                            {{-- <li>
                                 <a class="dropdown-item" href="">Profile</a>
-                            </li>
+                            </li> --}}
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf

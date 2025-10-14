@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Peminjam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -15,53 +15,91 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        // Data ringkasan (admin)
+        // === Kalau Admin ===
+        if ($user->id === 1) {
+            // Statistik dasar
+            $totalUsers = User::count();
+            $totalAssets = Asset::count();
+            $totalPeminjaman = Peminjam::count();
+            $countPending = Peminjam::where('status', 'menunggu')->count();
+
+            // Ambil semua data peminjaman untuk tabel admin
+            $peminjam = Peminjam::with('asset')
+                ->get()
+                ->groupBy(function ($item) {
+                    $nama = trim(strtolower($item->nama_peminjam ?? ''));
+                    $tgl = $item->tanggal_pinjam ? Carbon::parse($item->tanggal_pinjam)->format('Y-m-d') : 'no-date';
+                    $keperluan = trim(strtolower($item->keperluan ?? 'no-keperluan'));
+                    return $nama . '|' . $tgl . '|' . $keperluan;
+                })
+                ->map(function ($group) {
+                    $assetsLines = $group->map(function ($item) {
+                        $assetName = optional($item->asset)->nama_asset ?? '-';
+                        $assetCode = optional($item->asset)->kode_asset ?? '-';
+                        return "$assetName - $assetCode ({$item->jumlah})";
+                    })->toArray();
+
+                    return (object) [
+                        'group_key' => md5($group->pluck('id')->implode(',')),
+                        'nama_peminjam' => $group->first()->nama_peminjam,
+                        'assets' => implode('<br>', $assetsLines),
+                        'total_jumlah' => $group->sum('jumlah'),
+                        'tanggal_pinjam' => $group->first()->tanggal_pinjam,
+                        'status' => $group->first()->status,
+                        'ids' => $group->pluck('id')->toArray(),
+                    ];
+                })
+                ->values();
+
+            return view('public.dashboard', compact(
+                'peminjam',
+                'totalUsers',
+                'totalAssets',
+                'totalPeminjaman',
+                'countPending'
+            ));
+        }
+
+        // === Kalau User Biasa ===
         $totalUsers = User::count();
-        $totalAssets = Asset::count();
-        $totalPeminjaman = Peminjam::count();
+            $totalAssets = Asset::count();
+            $totalPeminjaman = Peminjam::count();
+            $countPending = Peminjam::where('status', 'menunggu')->count();
 
-        $recentPeminjaman = Peminjam::with('asset')
-            ->latest()
-            ->take(8)
-            ->get();
+            // Ambil semua data peminjaman untuk tabel admin
+            $peminjam = Peminjam::with('asset')
+                ->get()
+                ->groupBy(function ($item) {
+                    $nama = trim(strtolower($item->nama_peminjam ?? ''));
+                    $tgl = $item->tanggal_pinjam ? Carbon::parse($item->tanggal_pinjam)->format('Y-m-d') : 'no-date';
+                    $keperluan = trim(strtolower($item->keperluan ?? 'no-keperluan'));
+                    return $nama . '|' . $tgl . '|' . $keperluan;
+                })
+                ->map(function ($group) {
+                    $assetsLines = $group->map(function ($item) {
+                        $assetName = optional($item->asset)->nama_asset ?? '-';
+                        $assetCode = optional($item->asset)->kode_asset ?? '-';
+                        return "$assetName - $assetCode ({$item->jumlah})";
+                    })->toArray();
 
-        // --- Data untuk tampilan admin: group by nama_peminjam ---
-        $peminjam = Peminjam::with('asset')
-            ->get()
-            ->groupBy('nama_peminjam')
-            ->map(function ($group) {
-                $assetsLines = $group->map(function ($item) {
-                    // Perbaikan: Hindari optional() atau konversi ke string
-                    $assetName = $item->asset ? $item->asset->nama_asset : '-';
-                    $assetCode = $item->asset ? $item->asset->kode_asset : '-';
-                    return $assetName . ' - ' . $assetCode . ' (' . $item->jumlah . ')';
-                })->toArray();
+                    return (object) [
+                        'group_key' => md5($group->pluck('id')->implode(',')),
+                        'nama_peminjam' => $group->first()->nama_peminjam,
+                        'assets' => implode('<br>', $assetsLines),
+                        'total_jumlah' => $group->sum('jumlah'),
+                        'tanggal_pinjam' => $group->first()->tanggal_pinjam,
+                        'status' => $group->first()->status,
+                        'ids' => $group->pluck('id')->toArray(),
+                    ];
+                })
+                ->values();
 
-                return (object) [
-                    'nama_peminjam'  => $group->first()->nama_peminjam,
-                    'assets'         => implode('<br>', $assetsLines),
-                    'status'         => $group->first()->status,
-                    'id'             => $group->first()->id,
-                    'ids'            => $group->pluck('id')->toArray(),
-                ];
-            })->values();
-
-        // --- Data untuk tampilan user: daftar peminjaman miliknya ---
-        $peminjamans = Peminjam::with('asset')->latest()->get();
-
-        $countPending = $peminjamans->where('status', 'menunggu')->count();
-        $countApproved = $peminjamans->where('status', 'disetujui')->count();
-
-        return view('public.dashboard', compact(
-            'user',
-            'peminjam', 
-            'peminjamans', 
-            'countPending',
-            'countApproved',
-            'totalUsers',
-            'totalAssets',
-            'totalPeminjaman',
-            'recentPeminjaman'
+            return view('public.dashboard', compact(
+                'peminjam',
+                'totalUsers',
+                'totalAssets',
+                'totalPeminjaman',
+                'countPending'
         ));
     }
 }

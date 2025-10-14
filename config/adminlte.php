@@ -29,8 +29,10 @@ return [
     |
     */
 
-    'use_ico_only' => false,
-    'use_full_favicon' => false,
+    'favicon' => [
+        'use_ico_only' => true,
+        'use_full_favicon' => false,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -62,9 +64,9 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-    'logo_img_class' => 'brand-image img-circle elevation-3',
+    'logo' => '<b>Asset</b> Management',
+    'logo_img' => '/images/logoassetmanagement-09.png',
+    'logo_img_class' => 'brand-image',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
     'logo_img_alt' => 'Admin Logo',
@@ -83,9 +85,9 @@ return [
     */
 
     'auth_logo' => [
-        'enabled' => false,
+        'enabled' => true,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => '/images/logoassetmanagement-09.png',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -112,7 +114,7 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => '/images/logoassetmanagement-09.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -195,7 +197,7 @@ return [
     'classes_content_wrapper' => '',
     'classes_content_header' => '',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-primary elevation-4',
+    'classes_sidebar' => 'sidebar-light-primary elevation-2', // <= Buat ubah warna sidebar sebelah kiri
     'classes_sidebar_nav' => '',
     'classes_topnav' => 'navbar-white navbar-light',
     'classes_topnav_nav' => 'navbar-expand',
@@ -256,7 +258,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => 'admin',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -299,11 +301,11 @@ return [
 
     'menu' => [
         // Navbar
-        [
-            'type' => 'navbar-search',
-            'text' => 'Search',
-            'topnav_right' => true,
-        ],
+        // [
+        //     'type' => 'navbar-search',
+        //     'text' => 'Search',
+        //     'topnav_right' => true,
+        // ], fitur search dimatikan karena tidak berguna
         [
             'type' => 'fullscreen-widget',
             'topnav_right' => true,
