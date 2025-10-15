@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'logo' => '<b>Si</b>Pinjam',
+    'logo' => '<b style="color:#1B447F;font-weight:600;">SiPinjam</b>',
     'logo_img' => '/images/logoassetmanagement-09.png',
     'logo_img_class' => 'brand-image',
     'logo_img_xl' => null,
