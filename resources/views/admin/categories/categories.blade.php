@@ -52,8 +52,8 @@
             </table>
         </div>
     </div>
-    @include('admin.categories.create')
-    @include('admin.categories.edit')
+    @include('admin.categories.createCategory')
+    @include('admin.categories.editCategory')
 @stop
 
 @section('css')

@@ -7,7 +7,7 @@
 
         {{-- Header: judul & filter sejajar --}}
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-            <h1 class="h3 mb-0">Daftar Asset</h1>
+            <h2 class="m-0 fw-bold">Daftar Asset</h2>
 
             <form method="GET" action="{{ route('assets.index') }}" class="d-flex align-items-center">
                 <label for="category" class="fw-semibold me-2 mb-0">Filter:</label>
@@ -37,7 +37,7 @@
             <div class="row">
                 @foreach ($assets as $asset)
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 hover-card transition-all">
+                        <div class="card h-100 border-0 shadow-lg rounded-4 hover-card transition-all">
                             {{-- Gambar --}}
                             @if ($asset->gambar && file_exists(storage_path('app/public/' . $asset->gambar)))
                                 <a href="{{ route('assets.show', $asset->id) }}">
@@ -59,16 +59,21 @@
                                     {{ $asset->nama_asset }}
                                 </a>
 
-                                {{-- 🟢 Nama kategori --}}
+                                {{-- 🟢 Kategori teks biasa tapi sedikit tebal --}}
                                 @if ($asset->kategori)
-                                    <span class="badge bg-secondary mb-2">{{ $asset->kategori->name }}</span>
+                                    <p class="text-secondary fw-semibold small mb-2">
+                                        {{ $asset->kategori->name }}
+                                    </p>
                                 @endif
 
                                 {{-- Deskripsi --}}
                                 @if ($asset->deskripsi)
-                                    <p class="card-text text-muted small">{{ Str::limit($asset->deskripsi, 80) }}</p>
+                                    <p class="card-text text-muted small mb-3">
+                                        {{ Str::limit($asset->deskripsi, 80) }}
+                                    </p>
                                 @endif
 
+                                {{-- Tombol --}}
                                 @if (Auth::id() === 2)
                                     <div class="mt-auto">
                                         <form action="{{ route('keranjang.add') }}" method="POST">
@@ -99,13 +104,14 @@
     <style>
         /* Efek hover lembut pada card */
         .hover-card {
-            transition: all 0.25s ease-in-out;
+            transition: all 0.3s ease-in-out;
             background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
 
         .hover-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+            transform: translateY(-6px);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.20);
         }
 
         /* Hover teks */
@@ -113,19 +119,19 @@
             color: #0d6efd !important;
         }
 
-        /* Badge kategori */
-        .badge {
-            font-size: 0.75rem;
-            padding: 6px 10px;
-            border-radius: 8px;
+        /* Kategori text */
+        .text-secondary {
+            color: #6c757d !important;
+            letter-spacing: 0.3px;
         }
     </style>
 @stop
 @section('js')
     <script>
-        // Submit form saat kategori diubah
-        document.getElementById('category').addEventListener('change', function() {
-            this.form.submit();
-        });
+        // Inisialisasi tooltips Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
     </script>
 @stop
