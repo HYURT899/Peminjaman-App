@@ -111,6 +111,7 @@
                                     <th class="border-0">No</th>
                                     <th class="border-0">Peminjam</th>
                                     <th class="border-0">Aset</th>
+                                    <th class="border-0">Tanggal Pinjam</th>
                                     <th class="border-0">Status</th>
                                 </tr>
                             </thead>
@@ -120,6 +121,7 @@
                                         <td class="align-middle">{{ $loop->iteration }}</td>
                                         <td class="align-middle fw-medium">{{ $pinjam->nama_peminjam }}</td>
                                         <td class="align-middle">{!! $pinjam->assets !!}</td>
+                                        <td class="align-middle">{{ $pinjam->tanggal_pinjam }}</td>
                                         <td class="align-middle">
                                             <span
                                                 class="badge rounded-pill
@@ -134,7 +136,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-4">
+                                        <td colspan="5" class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="fas fa-inbox fa-2x mb-2"></i>
                                                 <p class="mb-0">Tidak ada data peminjaman.</p>
@@ -191,6 +193,7 @@
                                     <th class="border-0">No</th>
                                     <th class="border-0">Peminjam</th>
                                     <th class="border-0">Aset</th>
+                                    <th class="border-0">Tanggal Pinjam</th>
                                     <th class="border-0">Status</th>
                                 </tr>
                             </thead>
@@ -200,6 +203,7 @@
                                         <td class="align-middle">{{ $loop->iteration }}</td>
                                         <td class="align-middle fw-medium">{{ $pinjam->nama_peminjam }}</td>
                                         <td class="align-middle">{!! $pinjam->assets !!}</td>
+                                        <td class="align-middle">{{ $pinjam->tanggal_pinjam }}</td>
                                         <td class="align-middle">
                                             <span
                                                 class="badge rounded-pill
@@ -214,7 +218,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-4">
+                                        <td colspan="5" class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="fas fa-inbox fa-2x mb-2"></i>
                                                 <p class="mb-0">Tidak ada data peminjaman.</p>

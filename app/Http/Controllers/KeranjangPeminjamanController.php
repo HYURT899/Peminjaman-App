@@ -81,7 +81,7 @@ class KeranjangPeminjamanController extends Controller
             KeranjangPeminjaman::where('user_id', Auth::id())->delete();
         });
 
-        return redirect()->route('keranjang.index')->with('success', 'Pengajuan dikirim');
+        return redirect()->route('public.assets')->with('success', 'Pengajuan dikirim');
     }
 
     public function delete($id)

@@ -51,7 +51,7 @@ Route::middleware('auth',)->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Halaman daftar asset
-    Route::resource('/daftar_asset', AssetController::class)->names('assets');
+    Route::resource('/daftar_asset', AssetController::class)->names('public.assets');
 
     // Keranjang
     // daftar isi keranjang
